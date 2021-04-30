@@ -89,7 +89,7 @@ The *Simple Enclosure* front part is designed to overlap the back enclosure part
 ## Screw-in Enclosure
 The *Screw-in Enclosure* is a more robust, yet still compact enclosure for the NeoPixel Stick and associated 3- or 4-conductor wiring harness that relies on M3 mounting hardware to keep the assembly together. The *Screw-in Enclosure* has many of the same features as the *Simple Enclosure* described above (e.g. the way the PWB sits in the lip of the back enclosure part, the pocket below PWB for soldered wiring harness, the way the LEDs protrude through the openings in the front enclosure part, etc.). However, it has the added regions on each end of the PWB to incorporate the mounting hardware. 3D printed versions of the *Screw-in Enclosure* parts are shown below.
 
-<img src="assets/screwin_enclosure_parts_printed.png" height="300px">
+<img src="assets/screwin_enclosure_parts_printed.jpg" height="300px">
 
 This enclosure is designed such that mounting hardware can be completely flush-mount, with inset nut pocket in the back of the back enclosure part and inset flat-head screw provision in front enclosure part. 
 
