@@ -1,0 +1,6 @@
+
+.DS_Store
+*.3mf
+*.stl
+*.gcode
+frame*.png
