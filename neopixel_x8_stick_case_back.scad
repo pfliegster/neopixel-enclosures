@@ -52,7 +52,18 @@ include <neopixel_x8_stick_pwb.scad>
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 if ($include_back == undef) {
-    neopixel_stick_case_back(screw_case = true, flush_perim = true);
+    neopixel_stick_case_back(
+        screw_case = true,
+        screw_hole_diameter = 3.2, // Slightly bigger than M3 screw diameter 
+        screw_depth = 6.5,         // Set this to at least 'back_surface_z' to go all the way through
+        flush_perim = true,
+        include_nut_pocket = true,
+        nut_pocket_depth = 3.5,
+        back_alpha = 1.0
+    );
+    // Echo some dimensional information to console window:
+    echo("Back Enclosure Part height = ", back_surface_z, " mm");
+    echo("  --> Plus Peg Extension = ", peg_extension, " mm");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +75,19 @@ if ($include_back == undef) {
 //      screw_case: Set to true for the enclosure that attaches front & back part
 //                  with mounting screws (M3 screws and nuts); False yields the Simple
 //                  Enclosure type.
+//      screw_hole_diameter: Diameter of screw hole in enclosure part, only used if 
+//                  screw_case = true. For M3 hardware, set thie to 3.2mm in order to have
+//                  a little clearance for the screw when using an M3 Nut also. Otherwise,
+//                  you this can be slightly smaller if screwing directly into the plastic and
+//                  the nut is left off (include_nut_pocket = false).
 //      flush_perim: Set to true to "Bump out" back-most section of back enclosure piece
 //                  such that the perimeter is flush with the front enclosure piece.
+//      include_nut_pocket: set to true to add a cutout/pocket in back of part for M3 nut.
+//      nut_pocket_depth: depth to inset the nut pocket in the back of the enclosure.
+//      screw_depth: depth (from front surface) to make the screw hole, useful if nut pocket
+//                  is not included and you plan to screw M3 hardware directly into plastic.
+//      back_alpha: Setting used for visualization of preview for assembly fit-check
+//                  or animation.
 //
 //  Notes:
 //      1) The Enclosure is slightly bigger for screw_case = true. This option adds
@@ -74,8 +96,9 @@ if ($include_back == undef) {
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-module neopixel_stick_case_back(screw_case = false, flush_perim = false) {
-    color("dimgray", alpha = 1.0){
+module neopixel_stick_case_back(screw_case = false, screw_hole_diameter = 3.2, flush_perim = false,
+            include_nut_pocket = true, nut_pocket_depth = 4, screw_depth = back_surface_z, back_alpha = 1.0) {
+    color("dimgray", alpha = back_alpha){
         union() {
             render() difference() {
                 union() {
@@ -155,14 +178,18 @@ module neopixel_stick_case_back(screw_case = false, flush_perim = false) {
                     // Drill holes through the model for screws and cutout pockets for nuts
                     // for screw together variant of enclosure:
                     if (screw_case) {
-                        translate([-case_screw_offset, pwb_width/2, 0])
-                            cylinder(h = 2*bottom_cover_height, d = 3.2, center = true, $fn=80);
-                        translate([pwb_length + case_screw_offset, pwb_width/2, 0])
-                            cylinder(h = 2*bottom_cover_height, d = 3.2, center = true, $fn=80);
-                        translate([-case_screw_offset, pwb_width/2, pwb_height - back_surface_z])
-                            cylinder(h = 4, d = 7, center = true, $fn=6);
-                        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height - back_surface_z])
-                            cylinder(h = 4, d = 7, center = true, $fn=6);
+                        translate([-case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                            cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
+                        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                            cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
+                        if (include_nut_pocket) {
+                            translate([-case_screw_offset, pwb_width/2,
+                                pwb_height + nut_pocket_depth/2 - back_surface_z])
+                                cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
+                            translate([pwb_length + case_screw_offset, pwb_width/2,
+                                pwb_height + nut_pocket_depth/2 - back_surface_z])
+                                cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
+                        }
                     }
                 }
             }

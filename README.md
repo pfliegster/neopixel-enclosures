@@ -26,8 +26,19 @@ In order to create a complete enclosure, open the two primary enclosure design f
 Notice that each design file should automatically provide a *Preview* of the solid model, using the built-in default settings. In each of these design files, the model implementation is near the top of the file, just after the list of includes, embedded in an if statement like so (for the back enclosure part):
 
 ```openscad
-if ($include_front == undef) {
-    neopixel_stick_case_front(screw_case = true, screw_type = "flat");
+if ($include_back == undef) {
+    neopixel_stick_case_back(
+        screw_case = true,
+        screw_hole_diameter = 3.2,
+        screw_depth = 6.5,  // Set this to at least 'back_surface_z' to go all the way through
+        flush_perim = true,
+        include_nut_pocket = true,
+        nut_pocket_depth = 3.5,
+        back_alpha = 0.7
+    );
+    // Echo some dimensional information to console window:
+    echo("Back Enclosure Part height = ", back_surface_z, " mm");
+    echo("  --> Plus Peg Extension = ", peg_extension, " mm");
 }
 ```
 
@@ -35,7 +46,7 @@ The default enclosure type is the *Screw-in Enclosure* (`screw_case = true`). If
 
 Note: You will likely get console warnings in OpenSCAD with these two enclosure design files about unknown variables, such as this:
 ```
-WARNING: Ignoring unknown variable '$include_front' in file neopixel_x8_stick_case_front.scad, line 47
+WARNING: Ignoring unknown variable '$include_back' in file neopixel_x8_stick_case_back.scad, line 54
 ```
 You can safely ignore these warnings. They refer to special variables used to assemble all components into a top-level assembly (described below). However, other warnings may warrant investigation and you should ensure that there are no errors, especially after customization or more extensive modification of the design files.
 
@@ -72,6 +83,7 @@ For this enclosure part, the wiring harness is routed through a cutout in the ce
 <img src="assets/neopixel_enclosure_back_wiring_harness_fit_check.png" width="500px">
 
 The *Simple Enclosure* front part is designed to overlap the back enclosure part around the periphery; it slides in place over the back part and is currently just held on by friction (there is minimal space between the outer dimensions of the back part and the inner dimensions of the front part). The front part has alignment holes for the mounting pegs on the back enclosure part and cutouts for the 8 LEDs to fit into (and shine brightly through!).
+
 <img src="assets/neopixel_enclosure_simple_front2.png" width="500px">
 
 ## Screw-in Enclosure
@@ -97,6 +109,8 @@ If you don't have flathead M3 screws on-hand, you could use pan-head or other ro
 and the screws will protrude slightly from the front of the assembly:
 
 <img src="assets/screwin_enclosure_assy_panhead.png" width="500px">
+
+On the back enclosure part in particular, there are additional settings for the `screw_hole_diameter`, `screw_depth`, `include_nut_pocket` and `nut_pocket_depth` allow for even greater control over mounting hardware and options. For instance, setting `include_nut_pocket = false,` and the `screw_hole_diameter = 2.9,` allows for self-threading of an M3 screw into the back part instead of requiring a nut. In this case though you will want to use a shorter M3 screw to assemble the parts (6 mm or 8 mm length). See the comments in the design file for more detail on the use of these additional parameters.
 
 ## Assembly and Animation files
 As mentioned above in the *Customization* section, this repository provides a top-level assembly design file (**neopixel_x8_stick_assy.scad**) for help in visualizing how the enclosure parts fit together and performing fit check with other components like the NeoPixel PWB, wiring harness, and mounting hardware.
