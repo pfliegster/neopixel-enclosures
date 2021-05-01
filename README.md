@@ -1,10 +1,10 @@
 # NeoPixel Enclosures
  OpenSCAD design files for 3D-printed cases/enclosures for Adafruit's NeoPixel Stick and Strip products.
 
-<img src="assets/screw_enclosure_animate.gif" height="600px">
+<img src="assets/screw_enclosure_animate.mp4" height="600px">
 
 ## Introduction
-The Adafruit (@adafruit) NeoPixel products provide an easy and convenient way to add customized lighting effects to any project. The NeoPixel products can be driven from an Arduino or other microprocessors using Adafruit libraries and example code, 3rd-party libraries, or writing custom software that meets the strict timing requirements of the NeoPixel LEDs (e.g. WS2812 LED modules). Please see the [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) for more details on the NeoPixel ecosystem, their large array of products using these LEDs, electrical connections and software instructions and examples.
+The Adafruit NeoPixel products provide an easy and convenient way to add customized lighting effects to any project. The NeoPixel products can be driven from an Arduino or other microprocessors using Adafruit libraries and example code, 3rd-party libraries, or writing custom software that meets the strict timing requirements of the NeoPixel LEDs (e.g. WS2812 LED modules). Please see the [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) for more details on the NeoPixel ecosystem, their large array of products using these LEDs, electrical connections and software instructions and examples.
 
 This repository provides OpenSCAD design files for a couple of customizable enclosure designs for the [Adafruit NeoPixel Stick (8x 5050 RGB/RGBW LED) products](https://www.adafruit.com/?q=neopixel+stick&sort=BestMatch), along with utility modules for an Adafruit NeoPixel Stick 3D model, mounting hardware models and a 3-/4-conductor wiring harness tool for model verification and visualization of complete assemblies.
 
@@ -72,7 +72,7 @@ The top-level assembly includes both the front and back enclosure parts along wi
 ## Simple Enclosure
 The *Simple Enclosure* is a minimalist enclosure to provide ease in handling and basic protection to the NeoPixel Stick and companion 3- or 4-conductor wiring harness soldered to the back side of the NeoPixel Stick PWB. The enclosure is comprised of front and back 3D parts, which are the **neopixel_x8_stick_case_front.scad** and **neopixel_x8_stick_case_back.scad** design files referenced above in the Quick Start. 3D printed versions of these two models are shown below.
 
-<img src="assets/neopixel_stick_simple_enclosure_parts.png" height="300px"> <img src="assets/neopixel_stick_8_case_photo.jpg" height="300px">
+<img src="assets/neopixel_stick_simple_enclosure_parts_printed.jpg" height="300px">
 
 The *Simple Enclosure* back part is designed to hold the NeoPixel Stick PWB on a perimeter *lip* and provides two cylindrical pegs with which to slide the PWB into place (using the NeoPixel Stick mounting holes). There is also a shallow pocket region behind the PWB which allows space for the wiring harness, providing ample room for solder joints on the PWB pads as well as a reasonable bend radius on the harness wires.
 
@@ -87,9 +87,9 @@ The *Simple Enclosure* front part is designed to overlap the back enclosure part
 <img src="assets/neopixel_enclosure_simple_front2.png" width="500px">
 
 ## Screw-in Enclosure
-The *Screw-in Enclosure* is a more robust, yet still compact enclosure for the NeoPixel Stick and associated 3- or 4-conductor wiring harness that relies on M3 mounting hardware to keep the assembly together. The *Screw-in Enclosure* has many of the same features as the *Simple Enclosure* described above (e.g. the way the PWB sits in the lip of the back enclosure part, the pocket below PWB for soldered wiring harness, the way the LEDs protrude through the openings in the front enclosure part, etc.). However, it has the added regions on each end of the PWB to incorporate the mounting hardware. 3D printed versions of the *Screw-in Enclosure* parts are shown below.
+The *Screw-in Enclosure* is a more robust, yet still compact enclosure for the NeoPixel Stick and associated 3- or 4-conductor wiring harness that relies on M3 mounting hardware to keep the assembly together. The *Screw-in Enclosure* has many of the same features as the *Simple Enclosure* described above (e.g. the way the PWB sits in the lip of the back enclosure part, the pocket below PWB for soldered wiring harness, the way the LEDs protrude through the openings in the front enclosure part, etc.). However, it has the added regions on each end of the PWB to incorporate the mounting hardware. 3D printed versions of the *Screw-in Enclosure* parts are shown below along with various assembly hardware options.
 
-<img src="assets/screwin_enclosure_parts_printed.jpg" height="300px">
+<img src="assets/neopixel_stick_screwin_enclosure_parts_printed.jpg" width="500px">
 
 This enclosure is designed such that mounting hardware can be completely flush-mount, with inset nut pocket in the back of the back enclosure part and inset flat-head screw provision in front enclosure part. 
 
