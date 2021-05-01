@@ -1,7 +1,7 @@
 # NeoPixel Enclosures
  OpenSCAD design files for 3D-printed cases/enclosures for Adafruit's NeoPixel Stick and Strip products.
 
-<img src="assets/screw_enclosure_animate.mp4" height="600px">
+<img src="assets/screw_enclosure_animate.gif" height="600px">
 
 ## Introduction
 The Adafruit NeoPixel products provide an easy and convenient way to add customized lighting effects to any project. The NeoPixel products can be driven from an Arduino or other microprocessors using Adafruit libraries and example code, 3rd-party libraries, or writing custom software that meets the strict timing requirements of the NeoPixel LEDs (e.g. WS2812 LED modules). Please see the [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) for more details on the NeoPixel ecosystem, their large array of products using these LEDs, electrical connections and software instructions and examples.
