@@ -13,10 +13,8 @@
 //   of PWB in case and with wiring harness model.
 //
 // Author: Keith Pflieger
-// Date:   March 2021
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// Thingiverse user: RoboticDreams
 // github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************
@@ -52,7 +50,7 @@ module pwb_model() {
             }
         }
         
-        // Solder pads (for visulization):
+        // Solder pads (for visualization):
         for (i = [ 0: 3 ]) { // 4 pads per on each end of board
             translate([ (pwb_pad_center_x1 - pwb_pad_length/2),
                         (pwb_pad_center_y1 + i*pwb_pad_pitch_y - pwb_pad_width/2),
@@ -75,7 +73,7 @@ module pwb_model() {
         
         // Passive 0805 Cap/Res components:
         for (i = [ 0 : len(c0805_x) - 1 ]) {
-            // V2 version of Neopixel stick has a resistor (black) instead of capacitor (brown) in position 1:
+            // V2 version of NeoPixel stick has a resistor (black) instead of capacitor (brown) in position 1:
             color((i>0) ? "sienna":"black") {
                 translate([c0805_x[i], c0805_y, pwb_height + c0805_height/2])
                     cube([c0805_length, c0805_width, c0805_height], center = true);

@@ -12,10 +12,8 @@
 //      This front case has cutouts for the 8 LED modules.
 //
 // Author: Keith Pflieger
-// Date:   April 2021
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// Thingiverse user: RoboticDreams
 // github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************
@@ -35,17 +33,20 @@ include <neopixel_x8_stick_pwb.scad>
 //  as desired.
 //
 //  Notes:
-//      1) Some changes here (such as to 'screw_case') require a corresponding
-//         change to the back enclosure part in order for the case to operate
-//         correctly. Otherwise you could end up with dissimilar part types for
-//         front and back parts.
+//      1) Some changes here (such as to 'screw_case' and 'case_screw_separation')
+//         require a corresponding change to the back enclosure part in order for 
+//         the case to function correctly. Otherwise you could end up with dissimilar 
+//         part types for front and back parts.
 //      2) Changing enclosure options here does not change them in the top-level
 //         assembly or animation design files. So if  you need to verify a change
 //         in these settings, you will have to duplicate the change there too.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 if ($include_front == undef) {
-    neopixel_stick_case_front(screw_case = true, screw_type = "flat");
+    neopixel_stick_case_front(
+        screw_case = true,
+        screw_type = "flat",
+        case_screw_separation = 60 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -54,11 +55,12 @@ if ($include_front == undef) {
 //      Enclosure Front Part for NeoPixel Stick 8 products.
 //
 //  Parameters:
-//      screw_case: Set to true to select the enclosure that attaches fron & back part
+//      screw_case: Set to true to build an enclosure that attaches front & back parts
 //                  with mounting screws (M3 screws and nuts); False yields the Simple
 //                  Enclosure type.
 //      screw_type: Can be "none" (default, for fit check), "rounded" (panel or button
 //                  heads), or "flat" (e.g. 90 deg. inset/flush-mount screws).
+//      case_screw_separation: Distance between the two case screws, center to center (for 
 //      front_alpha: Setting used for visualization of preview for assembly fit-check
 //                  or animation.
 //
@@ -73,13 +75,17 @@ if ($include_front == undef) {
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-module neopixel_stick_case_front(screw_case = false, screw_type = "none", front_alpha = 1.0) {
+module neopixel_stick_case_front(screw_case = false, screw_type = "none",
+            case_screw_separation = 60, front_alpha = 1.0) {
 
     if (screw_case) {
-    assert(((screw_type == "rounded") || (screw_type == "flat") ||
-            (screw_type == "none")),
-            "Unsupported screw_type for enclosure mounting! Please check spelling.");
+        assert(((screw_type == "rounded") || (screw_type == "flat") ||
+                (screw_type == "none")),
+                "Unsupported screw_type for enclosure mounting! Please check spelling.");
+        assert(case_screw_separation > pwb_length + 6.0);
     }
+    
+    case_screw_offset = (case_screw_separation - pwb_length)/2;
     
     color("dimgray", alpha = front_alpha){
         render() difference() {
@@ -87,9 +93,9 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none", front_
                 difference() {
                     // First, add the main volume of the front enclosure part and hollow out
                     //  the volume taken up by the back enclosure body ...
-                    front_cover_body(screw_case = screw_case);
+                    front_cover_body(screw_case = screw_case, case_screw_offset = case_screw_offset);
                     union() {
-                        back_cover_body(delta = 0.3, screw_case = screw_case);
+                        back_cover_body(delta = 0.3, screw_case = screw_case, case_screw_offset = case_screw_offset);
                         translate([rounding_radius + pwb_lip_sides,
                                 rounding_radius + 0.75, pwb_height - rounding_radius]) {
                             minkowski() {
@@ -125,7 +131,7 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none", front_
             union() {
                 // Add little pockets/indents to align with top of mounting pegs from case back:
                 mounting_pegs(delta = mtg_peg_front_clearance/2, $fn=80);
-                // Holes through fron cover for WS281x LED Modules:
+                // Holes through front cover for WS281x LED Modules:
                 for (i = [ 0: num_leds - 1 ]) {
                     translate([led_start_x + i*led_spacing_x - led_length/2 - cover_led_clearance/2,
                                led_start_y + i*led_spacing_y - led_width/2 - cover_led_clearance/2,
@@ -137,12 +143,15 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none", front_
                 }
                 // Add holes for enclosure screws, either with inset head or not:
                 if (screw_case) {
+                    case_screw_length = 10;
                     translate([-case_screw_offset, pwb_width/2,
                         pwb_height + front_surface_z - case_screw_length])
-                        generic_screw(screw_diam = 3.2, head_type = screw_type, length = 10, $fn=80);
+                        generic_screw(screw_diam = 3.4, head_type = screw_type,
+                            head_diam = 6.1, head_height = 2.0, length = case_screw_length, $fn=80);
                     translate([pwb_length + case_screw_offset, pwb_width/2,
                         pwb_height + front_surface_z - case_screw_length])
-                        generic_screw(screw_diam = 3.2, head_type = screw_type, length = 10, $fn=80);
+                        generic_screw(screw_diam = 3.4, head_type = screw_type,
+                        head_diam = 6.1, head_height = 2.0, length = case_screw_length, $fn=80);
                 }
             }
         }
@@ -157,16 +166,19 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none", front_
 //
 //   CAUTION: Enabling or modifying anything below can make the
 //      rendered or 3D model contained in this file unusable
-//      unless you disable it again before rendor/export of STL.
+//      unless you disable it again before render/export of STL.
 //
 /////////////////////////////////////////////////////////////////
 if ($include_front == undef) {
     if ($include_pwb) pwb_model($fn=40);
-*    front_cover_body(screw_case = true);
-*    back_cover_body(screw_case = true);
 
     // Some Mounting Hardware models ...
 *    color(c = [0.2, 0.2, 0.2] , alpha = 1.0) union() {
+        // Mounting Hardware variables:
+        case_screw_length = 10;
+        case_screw_separation = 60;
+        case_screw_offset = (case_screw_separation - pwb_length)/2;
+
         // Align screw flanges with front of front enclosure piece:
         translate([-case_screw_offset, pwb_width/2, pwb_height + front_surface_z - case_screw_length])
             test_align_shaft_1x10mm();

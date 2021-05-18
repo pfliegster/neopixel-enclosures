@@ -4,11 +4,13 @@
 <img src="assets/screw_enclosure_animate.gif" height="600px">
 
 ## Introduction
-The Adafruit NeoPixel products provide an easy and convenient way to add customized lighting effects to any project. The NeoPixel products can be driven from an Arduino or other microprocessors using Adafruit libraries and example code, 3rd-party libraries, or writing custom software that meets the strict timing requirements of the NeoPixel LEDs (e.g. WS2812 LED modules). Please see the [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) for more details on the NeoPixel ecosystem, their large array of products using these LEDs, electrical connections and software instructions and examples.
+The Adafruit NeoPixel products provide an easy and convenient way to add customized lighting effects to any project. The NeoPixel products can be driven from an Arduino or other microprocessor using Adafruit libraries and example code, 3rd-party libraries, or writing custom software that meets the strict timing requirements of the NeoPixel LEDs (e.g. WS2812 LED modules). Please see the [Adafruit NeoPixel Überguide](https://learn.adafruit.com/adafruit-neopixel-uberguide) for more details on the NeoPixel ecosystem, their large array of products using these LEDs, electrical connections and software instructions and examples.
 
 This repository provides OpenSCAD design files for a couple of customizable enclosure designs for the [Adafruit NeoPixel Stick (8x 5050 RGB/RGBW LED) products](https://www.adafruit.com/?q=neopixel+stick&sort=BestMatch), along with utility modules for an Adafruit NeoPixel Stick 3D model, mounting hardware models and a 3-/4-conductor wiring harness tool for model verification and visualization of complete assemblies.
 
 The design files have sensible default enclosure settings and dimensions, but can be easily customized for individual needs. There are customization notes and comments sprinkled through the design files, along with some customization instructions listed below in this README document. The default NeoPixel Stick enclosure type is the *Screw-in Enclosure*, which requires the addition of some M3 mounting hardware in order to stay assembled. The *Screw-in Enclosure* is more robust, but slightly larger than the basic (minimalist) *Simple Enclosure*, which does not require any additional mounting hardware and relies on friction between the overlapping front/back parts to stay assembled (there is currently no snap/latch mechanism in place to keep the parts together, but this is under consideration for future improvement).
+
+There is also an alternate back enclosure module included that provides a configurable mounting tab off the bottom edge of the enclosure. This alternate back part is designed to work directly with the *Screw-in* front enclosure part as-is.
 
 OpenSCAD design file notes:
 1. All units in mm.
@@ -23,51 +25,68 @@ In order to create a complete enclosure, open the two primary enclosure design f
 * **neopixel_x8_stick_case_back.scad**: The back enclosure 3D model part, and
 * **neopixel_x8_stick_case_front.scad**: The front enclosure 3D model part
 
-Notice that each design file should automatically provide a *Preview* of the solid model, using the built-in default settings. In each of these design files, the model implementation is near the top of the file, just after the list of includes, embedded in an if statement like so (for the back enclosure part):
+Notice that each design file should automatically provide a *Preview* of the solid model (enabled by default in OpenSCAD, or hit the *Preview* button if it is turned off), using the built-in default parameters. In each of these design files, the model implementation is near the top of the file, just after the list of includes, embedded in an if statement like so (for the back enclosure part):
 
 ```openscad
 if ($include_back == undef) {
-    neopixel_stick_case_back(
-        screw_case = true,
-        screw_hole_diameter = 3.2,
-        screw_depth = 6.5,  // Set this to at least 'back_surface_z' to go all the way through
-        flush_perim = true,
-        include_nut_pocket = true,
-        nut_pocket_depth = 3.5,
-        back_alpha = 0.7
-    );
-    // Echo some dimensional information to console window:
-    echo("Back Enclosure Part height = ", back_surface_z, " mm");
-    echo("  --> Plus Peg Extension = ", peg_extension, " mm");
-}
+    if (!_include_mounting_plate) {
+        neopixel_stick_case_back (
+            screw_case = true,
+            screw_hole_diameter = 3.4,
+            screw_depth = 6.5,
+            case_screw_separation = 60,
+            case_thickness = 10.25,
+            add_back_mounting_screws = false,
+            flush_perim = true,
+            include_nut_pocket = true,
+            nut_pocket_depth = 3.5,
+            back_alpha = 1.0
+        );
+    } else {
+        ...
 ```
 
 The default enclosure type is the *Screw-in Enclosure* (`screw_case = true`). If you would like to create the *Simple Enclosure* instead, change this value to **false** on both front and back enclosure parts. After any changes to module settings, you may preview the changes by saving the design file or hitting the *Preview* button (or F5) in OpenSCAD. When you are satisfied, *Render* the model, *Export as STL* and ... open with your Slicer or other software of choice for implementation on your 3D printer.
 
 Note: You will likely get console warnings in OpenSCAD with these two enclosure design files about unknown variables, such as this:
 ```
-WARNING: Ignoring unknown variable '$include_back' in file neopixel_x8_stick_case_back.scad, line 54
+WARNING: Ignoring unknown variable '$include_back' in file neopixel_x8_stick_case_back.scad, line 58
 ```
 You can safely ignore these warnings. They refer to special variables used to assemble all components into a top-level assembly (described below). However, other warnings may warrant investigation and you should ensure that there are no errors, especially after customization or more extensive modification of the design files.
 
 ## Going Further: Customization
-Peruse the settings and dimensions contained in the **neopixel_case_constants.scad** include file and customize these parameters to meet your own needs. For example, you could move the mounting hardware further away from the ends of the PWB by changing the following line:
-```openscad
-case_screw_offset = 6;    // From each end of PWB
-```
-Save your changes and go back to the two enclosure design files to immediately see the impact.
+Any of the parameters for the front and back enclosure parts can be modified to suit special needs. For instance, the `case_screw_separation` (distance between the two case mounting screws) can be changed from the default of 60 (mm) to something else, like 75. After modification, save your changes and you will immediately see the effect in the preview or render output of the model (in this case, you will see the case length grow by 15 mm, 7.5 mm on each side left/right of the PWB mounting position).
 
-Similarly, if you want to make the enclosure thicker ... modify the following line in **neopixel_case_constants.scad**:
+Note that certain parameters (like `case_screw_separation` and `screw_case`) must be identical in both front and back enclosure parts, otherwise the 3D printed models will not fit together, so use some caution when changing some of these settings.
+
+Similarly, if you wanted to increase the overall thickness of the enclosure (front + back model parts screwed together), by 4.0 mm (perhaps to better match the height or thickness of other objects in a larger project), open the file **neopixel_x8_stick_case_back.scad** and find the line:
 ```openscad
-extra_back_thickness = 0.25; // used to make overall case assembly a little thicker than the case screw length.
+case_thickness = 10.25,
 ```
-If you were to make this 2.25 instead, this increases the thickness by 2 mm. Note that in this case you will probably also want to increase the length of the screws from 10 mm to 12 mm as well, otherwise the screws won't be long enough to thread into the M3 nuts. Just change this line accordingly:
-```openscad
-case_screw_length = 10;
-```
-Other settings can be changed in this file as well, such as changing the `cover_wall_thickness` or `cover_overlap_depth`. It is a good idea to verify fit after substantive changes before printing a new highly-customized enclosure part. A good way to do this is using the **neopixel_x8_stick_assy.scad** top-level assembly design file also included in the repository.
+and change parameter setting from the default 10.25 to 14.25, save the file, preview or render the model and you will see the back model part thickness/height increase by 4 mm. Be aware that the default 10.25 mm case_thickness works well for the *Screw-in* enclosure when using 10 mm length M3 screws. Changing the thickness to 14.25 could require the use of longer case screws (say 14 mm), unless you were to do something else to compensate for this such as increasing the nut pocket depth so that the M3 nut will still engage with the screw once assembled.
+
+In addition to customization by modifying the various module parameters, you can also peruse the settings and dimensions contained in the **neopixel_case_constants.scad** include file and customize these parameters to meet your own needs. For example, you could modify the `cover_wall_thickness` or `cover_overlap_depth` settings which will affect construction of both front and back enclosure parts. It is a good idea to verify fit after substantive changes before printing a customized enclosure part. A good way to do this is using the **neopixel_x8_stick_assy.scad** top-level assembly design file also included in the repository.
 
 The top-level assembly includes both the front and back enclosure parts along with models of the PWB, wiring harness, and mounting hardware if applicable. Additional details on use of the Assembly design file is provided below.
+
+## Advanced Use: Adding Neopixel Enclosures to other projects
+NeoPixel lighting can easily be added to other OpenSCAD design projects. Typically you will only require the back enclosure model, so you will have to include the **neopixel_x8_stick_case_back.scad** design file in the file from where you need to reference it, as shown here:
+```openscad
+$include_back = true;
+include <"path-to-github-repo"/neopixel-enclosures/neopixel_x8_stick_case_back.scad>
+```
+where "path-to-github-repo" is an absolute or relative path for the top-level directory above where this repository is installed. Make sure you keep the `$include_back` *special variable* definition in order to work properly (more on this type of special variable is detailed below in the section describing Assembly and Animation design files).
+
+Note that while it is not necessary for the construction of a model part incorporating the NeoPixel Stick Enclosure design, you may also want to include the *front* part for visualization or assembly verification by similarly including its OpenSCAD design files as well:
+```openscad
+$include_front = true;
+include <"path-to-github-repo"/neopixel-enclosures/neopixel_x8_stick_case_front.scad>
+```
+Also included in the **neopixel_x8_stick_case_back.scad** design file are several accessory modules (described in the next section) to aid in incorporating the enclosure into other, complex assemblies. An example of this is shown below, where two differently customized NeoPixel Stick Enclosure Assemblies are incorporated into a modified version of the [MuSHR Racecar](https://mushr.io/about/) robotic vehicle design:
+
+<img src="assets/MuSHR_body_with_neopixel_lighting_added.png" width="500px">
+
+It has both a headlight assembly plus a top lightbar assembly (above the depth camera) ... Cool!
 
 ## Simple Enclosure
 The *Simple Enclosure* is a minimalist enclosure to provide ease in handling and basic protection to the NeoPixel Stick and companion 3- or 4-conductor wiring harness soldered to the back side of the NeoPixel Stick PWB. The enclosure is comprised of front and back 3D parts, which are the **neopixel_x8_stick_case_front.scad** and **neopixel_x8_stick_case_back.scad** design files referenced above in the Quick Start. 3D printed versions of these two models are shown below.
@@ -112,8 +131,39 @@ and the screws will protrude slightly from the front of the assembly:
 
 On the back enclosure part in particular, there are additional settings for the `screw_hole_diameter`, `screw_depth`, `include_nut_pocket` and `nut_pocket_depth` allow for even greater control over mounting hardware and options. For instance, setting `include_nut_pocket = false,` and the `screw_hole_diameter = 2.9,` allows for self-threading of an M3 screw into the back part instead of requiring a nut. In this case though you will want to use a shorter M3 screw to assemble the parts (6 mm or 8 mm length). See the comments in the design file for more detail on the use of these additional parameters.
 
+The *Screw-in Enclosure* is a great way to protect and view the NeoPixel Stick and the lighting pattern driven to it. However, often the enclosure assembly will need to be mounted to something in order to be useful for your projects. An easy way to do this is to turn on the `add_back_mounting_screws` for the back enclosure part (set this value to `true`), and two M3 flathead/inset screw-holes will be added to the part as shown below:
+
+<img src="assets/screwin_enclosure_back_with_mounting.png" width="500px">
+
+Note that no change is required to the front enclosure part for this option since this option only affect construction of the back part. If you are planning to mount this assembly to another OpenSCAD design project, you will need to ensure that there are clearance holes (or self-threading screw holes) in the part you will be mounting the NeoPixel Assembly to. You will also need to ensure that there is a clearance region or hole to allow the wiring harness to pass through the back of the NeoPixel enclosure to connect to power and digital control from the PWB that will be driving the lighting pattern. In order to assist the user with this operation, a couple of extra accessory modules are provided in the **neopixel_x8_stick_case_back.scad** design file: *HarnessCutoutRegionExtended()*, *MountingScrewsCutoutRegion()* and *NeopixelCaseCutoutRegion()*. Using the same modified [MuSHR Racecar](https://mushr.io/about/) example from above, the following image shows the use of these accessory modules to create mounting provisions for the headlight assembly on the front cover model piece:
+
+<img src="assets/using_accessory_modules_in_MuSHR.png" width="500px">
+
+### Alternate Back Enclosure Module with Mounting Tab
+As an alternative to mounting the enclosure to other objects using the `add_back_mounting_screws` parameter described above, the *neopixel_stick_case_back_on_mounting_plate()* module (in the **neopixel_x8_stick_case_back.scad** design file) provides this capability with the addition of a mounting tab/plate. This alternate back module has configurable parameters for the mounting plate dimensions and is fully compatible with the *Screw-in* version of the front enclosure part.
+Note that the `mounting_plate_width` parameter represents the width of the entire model part (i.e. it includes the width of the NeoPixel Enclosure itself).
+
+This alternate back module has many of the same configuration parameters as the regular back part, but is currently only designed to work with the *Screw-in* enclosure style and forced `fluch_perim = true` setting. It also forces certain dimensional properties on the resulting part. In particular, it has no `case_thickness` parameter, but instead derives this value and constructs the model thickness based upon the need for the flush "bumpout" region to be equal to the `mounting_plate_thickness` parameter (this is to ensure that nothing obstructs installation of the front enclosure part to this back part). Also, the current implementation of this alternate back part does not have any through holes for screws in the mounting tab itself. You will have to add these manually in the desired locations (using the OpenSCAD *difference()* operator).
+
+In order to print this version of the back enclosure part (instead of the default back model), look for the following lines at the top of **neopixel_x8_stick_case_back.scad**:
+```openscad
+
+// What are we rendering? Either the Enclosure Back part by itself or installed on
+// mounting plate (such as for use with MuSHR Racecar chassis components):
+_include_mounting_plate = false;
+```
+and change `_include_mounting_plate` to `true`, and you will get this:
+
+<img src="assets/neopixel_back_with_mounting_plate.png" width="500px">
+
+Continuing with the MuSHR design example detailed above, I replaced the T265 Mounting Plate (designed to allow mounting of both a RealSense D435i Depth Camera + T265 Tracking camera above it), with a *neopixel_stick_case_back_on_mounting_plate()* module and using the original dimensions from the T265 mounting plate ... resulting in this:
+
+<img src="assets/MuSHR Lightbar_replacing_T265.png" width="500px">
+
+The mounting holes shown in the mounting plate are aligned with the threaded holes of the depth camera and both this plate and depth camera are screwed into the racecar cover using M3 screws.
+
 ## Assembly and Animation files
-As mentioned above in the *Customization* section, this repository provides a top-level assembly design file (**neopixel_x8_stick_assy.scad**) for help in visualizing how the enclosure parts fit together and performing fit check with other components like the NeoPixel PWB, wiring harness, and mounting hardware.
+As mentioned above in the *Customization* section, this repository provides a top-level assembly design file (**neopixel_x8_stick_assy.scad**) for help in visualizing how the enclosure parts fit together and performing fit check/verification with other components like the NeoPixel PWB, wiring harness, and mounting hardware.
 Note that at the top of this file are a series of include files for incorporation of the various enclosure components and utility modules, along with a series of OpenSCAD *Special Variables* (beginning with a $-sign), like this:
 ```openscad
 $include_front = true;
@@ -128,16 +178,21 @@ screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for
 screw_type = "flat";    // set enclosure screw type to "none", "rounded" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
 front_alpha = 0.5;      // Set Alpha channel for color rendering of front enclosure part, aid in visualization
+back_alpha = 1.0;       // Set Alpha channel for color rendering of back enclosure part, aid in visualization
+case_screw_length = 10; // length of the physical mounting screws
 include_screws = true;  // include M3 screws for assembly visualization?
 include_nuts = true;    // include M3 nuts for assembly visualization?
+case_thickness = 10.25; // Overall Enclosure thickness (front and back parts assembled)
+case_screw_separation = 60.0;     // Center-to-Center distance of the two case mounting screws
+add_back_mounting_screws = false; // Add Mounting screws to back enclosure part
 ```
 Note that changes to these settings only affect how the assembly view works and does not affect how an individual part is actually implemented or printed (and vice versa). Please make those changes directly on the front and back enclosure parts as described previously as necessary for your application.
 
-One other feature is the use of an **alpha** setting for the rendered color of the front enclosure part. This allows for easier visualization of the assembly, specifically how the front part aligns with the back part and the installed NeoPixel Stick PWB. The default value is `front_alpha = 0.5`, but you can change this to anything between 0.0 (full transparency) to 1.0 (opaque).
+One other feature is the use of an **alpha** setting for the rendered color of the front and back enclosure parts. This allows for easier visualization of the assembly, specifically how the front part aligns with the back part and the installed NeoPixel Stick PWB. The default value is `front_alpha = 0.5`, but you can change this to anything between 0.0 (full transparency) to 1.0 (opaque).
 
 <img src="assets/neopixel_stick_8_screwin_assembly_transparent.png" width="500px">
 
-Finally - there is a fun, multi-stage animation of the assembly (**animate/neopixel_x8_stick_assy_animate.scad**) which can also be used for fit-checking and visualization of product assembly. It uses the same approach for settings and part visibility using special variables as the top-level assembly design file described above. In order to see the animation in action, you must first enable it using the OpenSCAD **View -> Animate** menu item, and then in the animation window pane, you should set the **FPS** (frames per second) and **Steps** to some reasonable values (like FPS = 10; Steps = 200). Have fun!
+Finally - there is a fun, multi-stage animation of the assembly (**animate/neopixel_x8_stick_assy_animate.scad**) which can also be used for fit-checking and visualization of product assembly. It uses the same approach for settings and part visibility using special variables as the top-level assembly design file described above. In order to see the animation in action, you must first enable it using the OpenSCAD **View -> Animate** menu item, and then in the animation window pane you should set the **FPS** (frames per second) and **Steps** to some reasonable values (like FPS = 10; Steps = 200). Have fun!
 
 ## Utility Modules
 In order to help visualize and design the enclosure model parts described above, I created a few utility modules in OpenSCAD as well. These include 3D models of the Adafruit NeoPixel Stick (**neopixel_x8_stick_pwb.scad**) and a parameterizable Wiring Harness(**neopixel_wiring_harness.scad**), each described below. These design files are not intended to be printed, but rather for fit-check or visualization such as in the top-level assembly design or animation files described above.

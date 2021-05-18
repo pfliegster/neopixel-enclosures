@@ -6,10 +6,8 @@
 //   Some useful constants for Wiring Harness and other modules dependent on it.
 //
 // Author: Keith Pflieger
-// Date:   April 2021
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// Thingiverse user: RoboticDreams
 // github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************

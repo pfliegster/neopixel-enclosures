@@ -3,11 +3,9 @@
 // Constants and utility modules for Neopixel Enclosure models.
 //
 // Author: Keith Pflieger
-// Date:   April 2021
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
 //
-// Thingiverse user: RoboticDreams
 // github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************
@@ -28,7 +26,7 @@ rounding_radius = 1;     // Rounding of all exterior corners using minkowski()
 pwb_pocket_margin = 0.5; // Allow for a reasonable manufacturing tolerance for PWB envelope
 mtg_peg_margin = 0.4;    // reduce peg diameter in back part slightly for easy fit into PWM mounting hole
 mtg_peg_front_shoulder = 0.55; // Shoulder around peg underneath PWB on back enclosure part
-mtg_peg_front_clearance = 0.4; // Increase clearance for peg cylinder diameter in front part indent/curout region
+mtg_peg_front_clearance = 0.4; // Increase clearance for peg cylinder diameter in front part indent/cutout region
 
 // Some constants defining how the perimeter 'lip' is constructed for the PWB to sit on in the back part:
 pwb_lip_sides = 0.2;
@@ -45,40 +43,21 @@ cover_overlap_depth = 4;
 cover_overlap_width = 1;
 cover_led_clearance = 0.6;
 
-// Definitions for mounting hardware:
-case_screw_offset = 6;  // From each end of PWB
-case_screw_length = 10;
-extra_back_thickness = 0.25; // used to make overall case assembly a little thicker than the case screw length.
-
-// Comuted constants useful for creation of front/back enclosure parts:
-bottom_cover_height = pwb_height + wire_diam + wire_bend_r + cover_wall_thickness + extra_back_thickness;
+// Computed constants useful for creation of front/back enclosure parts:
+bottom_cover_base_height = pwb_height + wire_diam + wire_bend_r + cover_wall_thickness;
 top_cover_height = led_height + cover_overlap_depth - rounding_radius/2;
 front_surface_z = led_height + rounding_radius/2;
-back_surface_z = bottom_cover_height + rounding_radius;
-
-// Computed Positions for Mounting Hardware:
-mtg_screw1_pos = [  -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
-mtg_screw2_pos = [  pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
-mtg_nut1_pos = [    -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
-mtg_nut2_pos = [    pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 //  module: back_cover_body
 //      Utility module for creation of Main body of the back enclosure piece
 //
-//      Optional parameter 'screw_case' (default = false):
+//      Optional parameters:
+//      'screw_case' (default = true):
 //          Indicates whether extra body sections should be added on
 //          each end of the PWB to attach case screws.
-//      Optional parameter 'delta' (default = 0mm):
+//      'delta' (default = 0 mm):
 //          * This option can be used if this 3D body module is used to cut out
 //          a portion of the front_cover_body() in order to provide a little
 //          relief to account for tolerances in the 3D print process.
@@ -86,18 +65,39 @@ mtg_nut2_pos = [    pwb_length + case_screw_offset,
 //          volume of the back enclosure piece in order to make the back part flush
 //          with the front part around the perimeter of the enclosure (used together
 //          with the next setting (remove_extra_height).
-//      Optional parameter 'remove_extra_height' (default = 0mm):
-//          This setting can be used to reduce the height of this 3D model segment,
-//          for use specifically in the creation of flush perimeter version of the case.
+//      'case_screw_offset' (default = 4.6 mm):
+//          Specifies the distance from each PWB edge to the center of the enclosure attachment
+//          screws. The default value of 4.6 yields a 60.0 mm enclosure screw separation.
+//          Only used for screw-in enclosure variant. Must be > 3 mm to allow for M3 mounting screws.
+//      'extra_back_thickness' (default = 0 mm):
+//          Use this parameter to increase the depth of the back enclosure part to suit
+//          your needs (like matching the screw length, or that of another object). Added
+//          to the 'back' side (rounded side) of model.
+//      'remove_extra_height' (default = 0 mm):
+//          This setting can be used to reduce the height of this 3D model segment, from
+//          the 'front' side (flat side). Used specifically in the creation of the flush
+//          version of the case.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module back_cover_body(screw_case = false, delta = 0, remove_extra_height = 0) {
+module back_cover_body (
+            screw_case = true,
+            delta = 0,
+            case_screw_offset = 4.6,
+            extra_back_thickness = 0,
+            remove_extra_height = 0
+        ) {
+            
     assert(delta >= 0);
-    assert((remove_extra_height >= 0) && (remove_extra_height < bottom_cover_height));
+    if (screw_case) assert(case_screw_offset > 3);
+    assert(extra_back_thickness >= 0);
+    assert((remove_extra_height >= 0) && (remove_extra_height < bottom_cover_base_height));
     
     // Compute the diameter of the extra "tab" material added to each side of the PWB
     // for the inclusion of mounting hardware for the screw-in version of the enclosure:
     attach_tab_diameter = pwb_width + 2*cover_wall_thickness + delta;
+
+    // Compute overall back enclosure part height from passed parameter:
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
 
     translate([ -cover_wall_thickness - delta/2,
                 -cover_wall_thickness - delta/2,
@@ -146,12 +146,20 @@ module back_cover_body(screw_case = false, delta = 0, remove_extra_height = 0) {
 //  module: front_cover_body
 //      Utility module for creation of main body of the front enclosure piece
 //
-//      Optional parameter 'screw_case' (default = false):
+//      Parameters:
+//      'screw_case' (default = true):
 //          Indicates whether extra body sections should be added on
 //          each end of the PWB to attach case screws.
+//      'case_screw_offset' (default = 4.6 mm):
+//          Specifies the distance from each PWB edge to the center of the enclosure attachment
+//          screws. The default value of 4.6 yields a 60.0 mm enclosure screw separation.
+//          Only used for screw-in enclosure variant. Must be > 3 mm to allow for M3 mounting screws.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module front_cover_body(screw_case = false) {
+module front_cover_body(screw_case = true, case_screw_offset = 4.6) {
+
+    // First, some error checking:
+    if (screw_case) assert(case_screw_offset > 3);
 
     // Compute the diameter of the extra "tab" material added to each side of the PWB
     // for the inclusion of mounting hardware for the screw-in version of the enclosure:
@@ -205,15 +213,26 @@ module front_cover_body(screw_case = false) {
 //      Utility module for creation of mounting pegs + shoulders for NeoPixel Stick
 //      to sit on and be held in place.
 //
-//      Optional parameter 'delta' (default = 0mm):
+//      Parameters:
+//      'delta' (default = 0 mm):
 //          can be used if 3D body is used to cut out sections of the
 //          front_cover_body() in order to provide a little relief to
 //          account for tolerances in the 3D print process.
+//      'extra_back_thickness' (default = 0 mm):
+//          Use this parameter to increase the depth of the back enclosure part to suit
+//          your needs (like matching the screw length, or that of another object). Added
+//          to the 'back' side (rounded side) of model.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module mounting_pegs(delta = 0) {
+module mounting_pegs(delta = 0, extra_back_thickness = 0) {
+
+    // First some error checking and variable computation:
     assert(delta >= 0);
+    assert(extra_back_thickness >= 0);
     
+    // Compute overall back enclosure part height from passed parameter:
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
+        
     translate([pwb_hole1_x, pwb_hole1_y,
                 pwb_height + (peg_extension - bottom_cover_height)/2])
         cylinder(h = bottom_cover_height + peg_extension,
@@ -278,19 +297,18 @@ module test_align_shaft_1x10mm()    generic_screw(screw_diam = 1, head_type = "n
 module m3_panhead_screw(length = 8) generic_screw(length = length, $fn=80);
 module m3_flathead_screw(length = 8) generic_screw(head_type = "flat", length = length, $fn=80);
 
-
 /////////////////////////////////////////////////////////////////
 //
 // Model for M3 Nut:
-//  Inner hole diameter set to 3mm; although again, it is slightly smaller
-//  Parameters: thick (default = 2.5mm)
-//              outer_diameter (default = 6.25mm)
+//  Inner hole diameter set to 3 mm; although again, it is slightly smaller
+//  Parameters: thick (default = 2.5 mm)
+//              outer_diameter (default = 6.25 mm)
 //  Notes: Default values based on an M3 nut I just happened to have and measured
 //      manually. However they are configurable for use elsewhere.
 //
-//      Outer shape is hexagonal with opposing sides being 5.4mm from each other and
-//      opposing vertices being about 6.2mm distance. I will approximate this with
-//      a cylindrical shape of Outer Diameter = 6.25mm, with $fn = 6
+//      Outer shape is hexagonal with opposing sides being 5.4 mm from each other and
+//      opposing vertices being about 6.2 mm distance. I will approximate this with
+//      a cylindrical shape of Outer Diameter = 6.25 mm, with $fn = 6
 //
 /////////////////////////////////////////////////////////////////
 module m3_nut(thick = 2.5, outer_diameter = 6.25) {
@@ -310,7 +328,7 @@ module m3_nut(thick = 2.5, outer_diameter = 6.25) {
 //
 //   CAUTION: Enabling or modifying anything below can make the
 //      rendered or 3D model contained in this file unusable
-//      unless you disable it again before rendor/export of STL.
+//      unless you disable it again before render/export of STL.
 //
 /////////////////////////////////////////////////////////////////
 
@@ -319,3 +337,59 @@ module m3_nut(thick = 2.5, outer_diameter = 6.25) {
 *m3x8mm_panhead_screw();
 *m3x10mm_flathead_screw();
 *test_align_shaft_1x10mm();
+
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//  Accessory Functions:
+//      Useful for implementing NeoPixel Stick enclosures in other 3D Models in OpenSCAD,
+//      Such as for adding lightbars to the MuSHR.io racecar chassis.
+//
+///////////////////////////////////////////////////////////////////////////////////////
+
+// used for cutout of other volume or collision detection, when mounting enclosure to other
+//  surfaces or models (like MuSHR Racecar Chassis):
+module enclosure_body_cutout(screw_case = true, case_screw_separation = 60,
+        case_thickness = 10.5, clearance = 0) {
+
+    // First some error checking and variable computation:
+    assert(clearance >= 0);
+    if (screw_case) assert(case_screw_separation > pwb_length + 6.0);
+    case_screw_offset = (case_screw_separation - pwb_length)/2;
+
+    minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
+    assert(case_thickness >= minimum_case_thickness);
+    extra_back_thickness = case_thickness - minimum_case_thickness;
+    // Compute overall back enclosure part height from passed parameter:
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
+    
+    // Compute the diameter of the extra "tab" material added to each side of the PWB
+    // for the inclusion of mounting hardware for the screw-in version of the enclosure:
+    extra_dimension = cover_wall_thickness + cover_overlap_width + rounding_radius + clearance;
+    body_length = pwb_length + 2*extra_dimension;
+    body_width  = pwb_width + 2*extra_dimension;
+
+    translate([ -extra_dimension, -extra_dimension,
+                pwb_height - bottom_cover_height - rounding_radius]) {
+        union() {
+            cube([body_length, body_width, case_thickness]);
+            if (screw_case) {
+                // Left "Tab" cylindrical element:
+                translate([extra_dimension - case_screw_offset,
+                    extra_dimension + pwb_width/2, case_thickness/2])
+                        cylinder(h = case_thickness, d = body_width, center = true, $fn=80);
+                // Left "Tab" cube/connection to main body:
+                translate([extra_dimension - case_screw_offset/2,
+                    extra_dimension + pwb_width/2, case_thickness/2])
+                        cube([case_screw_offset, body_width, case_thickness], center = true);
+                // Right "Tab" cylindrical element:
+                translate([extra_dimension + pwb_length + case_screw_offset,
+                    extra_dimension + pwb_width/2, case_thickness/2])
+                        cylinder(h = case_thickness, d = body_width, center = true, $fn=80);
+                // Right "Tab" cube/connection to main body:
+                translate([extra_dimension + pwb_length + case_screw_offset/2,
+                    extra_dimension + pwb_width/2, case_thickness/2])
+                        cube([case_screw_offset, body_width, case_thickness], center = true);
+            }
+        }
+    }
+}

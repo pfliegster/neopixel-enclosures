@@ -36,8 +36,30 @@ include <../neopixel_wiring_harness.scad>
 screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for simple enclosure
 screw_type = "flat";    // set enclosure screw type to "none", "rounded" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
+case_screw_length = 10; // length of the physical mounting screws
 include_screws = true;  // include M3 screws for assembly visualization?
 include_nuts = true;    // include M3 nuts for assembly visualization?
+case_thickness = 10.25; // Overall Enclosure thickness (front and back parts assembled)
+case_screw_separation = 60.0;     // Center-to-Center distance of the two case mounting screws
+add_back_mounting_screws = false; // Add Mounting screws to back enclosure part
+
+// Derived variables:
+case_screw_offset = (case_screw_separation - pwb_length)/2;
+back_surface_z = case_thickness - front_surface_z;
+
+// Computed Positions for Mounting Hardware:
+case_screw1_pos = [  -case_screw_offset,
+                    pwb_width/2,
+                    pwb_height + front_surface_z - case_screw_length];
+case_screw2_pos = [  pwb_length + case_screw_offset,
+                    pwb_width/2,
+                    pwb_height + front_surface_z - case_screw_length];
+case_nut1_pos = [    -case_screw_offset,
+                    pwb_width/2,
+                    pwb_height - back_surface_z];
+case_nut2_pos = [    pwb_length + case_screw_offset,
+                    pwb_width/2,
+                    pwb_height - back_surface_z];
 
 // The constants which will drive the various animation steps:
 // Start with display of PWB Only
@@ -123,32 +145,65 @@ union() {
     // Animate the Enclosure Back Model Part in multi-stages:
     if ($include_back) {
         if ($t > anim_t5) {
-            translate([0, 0, ($t<anim_t6)?
-                anim_off_z6*(1 - ($t - anim_t5)/anim_delta6) : 0])
-                    neopixel_stick_case_back(screw_case = screw_case, flush_perim = flush_case);
+            translate([0, 0, ($t<anim_t6)? anim_off_z6*(1 - ($t - anim_t5)/anim_delta6) : 0])
+                neopixel_stick_case_back (
+                    screw_case = screw_case,
+                    case_screw_separation = case_screw_separation,
+                    case_thickness = case_thickness,
+                    add_back_mounting_screws = add_back_mounting_screws,
+                    flush_perim = flush_case,
+                    include_nut_pocket = true,
+                    nut_pocket_depth = 3.5,
+                    back_alpha = 1.0
+                );
         } else if ($t > anim_t4) {
             translate([pwb_length/2, pwb_width/2, 0]) {
-                rotate([0, 0, ($t<anim_t5)?
-                    anim_rot_z5*(1 - ($t - anim_t4)/anim_delta5) : 0]) {
-    //                    translate([-pwb_length/2, -pwb_width/2, anim_off_z5])
-                        translate([-pwb_length/2, -pwb_width/2, 
-                            (anim_off_z5-anim_off_z6)*(1 - ($t - anim_t4)/anim_delta5) + anim_off_z6])
-                            neopixel_stick_case_back(screw_case = screw_case, flush_perim = flush_case);
+                rotate([0, 0, ($t<anim_t5)? anim_rot_z5*(1 - ($t - anim_t4)/anim_delta5) : 0]) {
+                    translate([-pwb_length/2, -pwb_width/2, 
+                        (anim_off_z5-anim_off_z6)*(1 - ($t - anim_t4)/anim_delta5) + anim_off_z6])
+                        neopixel_stick_case_back (
+                            screw_case = screw_case,
+                            case_screw_separation = case_screw_separation,
+                            case_thickness = case_thickness,
+                            add_back_mounting_screws = add_back_mounting_screws,
+                            flush_perim = flush_case,
+                            include_nut_pocket = true,
+                            nut_pocket_depth = 3.5,
+                            back_alpha = 1.0
+                        );
                 }
             }
         } else if ($t > anim_t3) {
             translate([pwb_length/2, pwb_width/2, 0]) {
                 rotate([0, 0, anim_rot_z4]) {
-                        translate([-pwb_length/2, -pwb_width/2, 
-                            (anim_off_z4-anim_off_z5)*(1 - ($t - anim_t3)/anim_delta4) + anim_off_z5])
-                            neopixel_stick_case_back(screw_case = screw_case, flush_perim = flush_case);
+                    translate([-pwb_length/2, -pwb_width/2, 
+                        (anim_off_z4-anim_off_z5)*(1 - ($t - anim_t3)/anim_delta4) + anim_off_z5])
+                        neopixel_stick_case_back (
+                            screw_case = screw_case,
+                            case_screw_separation = case_screw_separation,
+                            case_thickness = case_thickness,
+                            add_back_mounting_screws = add_back_mounting_screws,
+                            flush_perim = flush_case,
+                            include_nut_pocket = true,
+                            nut_pocket_depth = 3.5,
+                            back_alpha = 1.0
+                        );
                 }
             }
         } else if ($t > anim_t2 + 0.75*anim_delta3) {
             translate([pwb_length/2, pwb_width/2, 0]) {
                 rotate([0, 0, anim_rot_z3]) {
-                        translate([-pwb_length/2, -pwb_width/2, anim_off_z3])
-                            neopixel_stick_case_back(screw_case = screw_case, flush_perim = flush_case);
+                    translate([-pwb_length/2, -pwb_width/2, anim_off_z3])
+                        neopixel_stick_case_back (
+                            screw_case = screw_case,
+                            case_screw_separation = case_screw_separation,
+                            case_thickness = case_thickness,
+                            add_back_mounting_screws = add_back_mounting_screws,
+                            flush_perim = flush_case,
+                            include_nut_pocket = true,
+                            nut_pocket_depth = 3.5,
+                            back_alpha = 1.0
+                        );
                 }
             }
         }
@@ -157,21 +212,38 @@ union() {
     // Animate the Enclosure Front Model Part:
     if ($include_front) {
         if ($t > anim_t10) {
-                neopixel_stick_case_front(screw_case = screw_case, screw_type = screw_type, front_alpha = 1.0);
+            neopixel_stick_case_front(
+                screw_case = screw_case,
+                screw_type = screw_type,
+                case_screw_separation = case_screw_separation,
+                front_alpha = 1.0);
         } else if ($t > anim_t9) {
-            neopixel_stick_case_front(screw_case = screw_case, screw_type = screw_type, 
+            neopixel_stick_case_front(
+                screw_case = screw_case,
+                screw_type = screw_type,
+                case_screw_separation = case_screw_separation,
                 front_alpha = 0.5 + 0.5*($t-anim_t9)/anim_delta10 );
         } else if ($t > anim_t8) {
-            translate([0, 0, ($t<anim_t9)?
-                anim_off_z9*(1 - ($t - anim_t8)/anim_delta9) : 0])
-                    neopixel_stick_case_front(screw_case = screw_case, screw_type = screw_type, front_alpha = 0.5);
+            translate([0, 0, ($t<anim_t9)? anim_off_z9*(1 - ($t - anim_t8)/anim_delta9) : 0])
+                neopixel_stick_case_front(
+                    screw_case = screw_case,
+                    screw_type = screw_type,
+                    case_screw_separation = case_screw_separation,
+                    front_alpha = 0.5);
         } else if ($t > anim_t7) {
             translate([0, 0, anim_off_z7])
-                neopixel_stick_case_front(screw_case = screw_case, screw_type = screw_type, 
+                neopixel_stick_case_front(
+                    screw_case = screw_case,
+                    screw_type = screw_type,
+                    case_screw_separation = case_screw_separation,
                     front_alpha = 1.0 - 0.5*($t-anim_t7)/anim_delta8 );
         } else if ($t > anim_t6 + 0.75*anim_delta7) {
             translate([0, 0, anim_off_z7])
-                neopixel_stick_case_front(screw_case = screw_case, screw_type = screw_type, front_alpha = 1.0);
+                neopixel_stick_case_front(
+                    screw_case = screw_case,
+                    screw_type = screw_type,
+                    case_screw_separation = case_screw_separation,
+                    front_alpha = 1.0);
         }
     }
     
@@ -179,26 +251,26 @@ union() {
     if (include_screws) {
         color(c = [0.2, 0.2, 0.2] , alpha = 1.0) {
             if ($t > anim_s1_end) {
-                translate(mtg_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
             } else if ($t >= anim_s1_start) {
                 translate([0, 0, anim_s1_z_offset*(1 - ($t - anim_s1_start)/anim_s1_delta)]) {
-                    translate(mtg_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
                 }
             } else if ($t >= anim_s1_viz) {
                 translate([0, 0, anim_s1_z_offset]) {
-                    translate(mtg_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
                 }
             }
 
             if ($t > anim_s2_end) {
-                translate(mtg_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
             } else if ($t >= anim_s2_start) {
                 translate([0, 0, anim_s2_z_offset*(1 - ($t - anim_s2_start)/anim_s2_delta)]) {
-                    translate(mtg_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
                 }
             } else if ($t >= anim_s2_viz) {
                 translate([0, 0, anim_s2_z_offset]) {
-                    translate(mtg_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
                 }
             }
         }
@@ -206,26 +278,26 @@ union() {
     if (include_nuts) {
         color(c = [0.2, 0.2, 0.2] , alpha = 1.0) {
             if ($t > anim_n1_end) {
-                render() translate(mtg_nut1_pos) m3_nut(outer_diameter = 6.4);
+                render() translate(case_nut1_pos) m3_nut(outer_diameter = 6.4);
             } else if ($t >= anim_n1_start) {
                 translate([0, 0, anim_n1_z_offset*(1 - ($t - anim_n1_start)/anim_n1_delta)]) {
-                    render() translate(mtg_nut1_pos) m3_nut(outer_diameter = 6.4);
+                    render() translate(case_nut1_pos) m3_nut(outer_diameter = 6.4);
                 }
             } else if ($t >= anim_n1_viz) {
                 translate([0, 0, anim_n1_z_offset]) {
-                    render() translate(mtg_nut1_pos) m3_nut(outer_diameter = 6.4);
+                    render() translate(case_nut1_pos) m3_nut(outer_diameter = 6.4);
                 }
             }
 
             if ($t > anim_n2_end) {
-                render() translate(mtg_nut2_pos) m3_nut(outer_diameter = 6.4);
+                render() translate(case_nut2_pos) m3_nut(outer_diameter = 6.4);
             } else if ($t >= anim_n2_start) {
                 translate([0, 0, anim_n2_z_offset*(1 - ($t - anim_n2_start)/anim_n2_delta)]) {
-                    render() translate(mtg_nut2_pos) m3_nut(outer_diameter = 6.4);
+                    render() translate(case_nut2_pos) m3_nut(outer_diameter = 6.4);
                 }
             } else if ($t >= anim_n2_viz) {
                 translate([0, 0, anim_n2_z_offset]) {
-                    render() translate(mtg_nut2_pos) m3_nut(outer_diameter = 6.4);
+                    render() translate(case_nut2_pos) m3_nut(outer_diameter = 6.4);
                 }
             }
         }

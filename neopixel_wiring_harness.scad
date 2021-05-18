@@ -31,11 +31,9 @@
 //        DOUT         Green
 //
 // Author: Keith Pflieger
-// Date:   April 2021
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// Thingiverse user: RoboticDreams
-// github: pfliegster (https://github.com/pfliegster)
+// Github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************
 
@@ -68,34 +66,34 @@ wire4_y = wire3_y;
 //          This is the diameter of the conductor of the wire (not including insulation).
 //      insulation_d (default = 1.6 for 22AWG wire such as used by Adafruit cables):
 //          This is the outer diameter of the wire's insulation
-//      stripped_length (default = 1mm):
+//      stripped_length (default = 1 mm):
 //          Length of the stripped wire that is shown exposed.
-//      soldered_length (default = 0mm):
+//      soldered_length (default = 0 mm):
 //          Length of the stripped wire that is bent toward the PWB solder pad;
 //          this model will automatically put a bend in the exposed stripped
-//          section of wire as long as soldered_length > 0mm and stripped_length >
+//          section of wire as long as soldered_length > 0 mm and stripped_length >
 //          soldered_length + a small length that is required in order to bend the
 //          wire towards the PWB. If these conditions are not met, then this parameter
 //          will not be used & the stripped end will just be shown as a straight
 //          segment.
-//      prebend_length (default = 100mm):
+//      prebend_length (default = 100 mm):
 //          This wire model assumes that there will be a 90 degree bend for
 //          routing the wire out of the NeoPixel stick case (out the back side).
 //          This parameter sets the length of wire from the stripped end to the
 //          90 degree bend.
-//      postbend_length (default = 100mm):
+//      postbend_length (default = 100 mm):
 //          This is the length of wire for the 'pigtail' coming out of the back
 //          side of the board, after the 90 degree bend in the wire.
-//      bend_r (default = 3mm):
+//      bend_r (default = 3 mm):
 //          The bend radius of the 90 degree bend in the wire, transitioning
-//          from the prebend segment of wire to the postbend segment of wire.
-//      dogleg_dist (default = 0mm, which means the dogleg will be disabled):
+//          from the pre-bend segment of wire to the post-bend segment of wire.
+//      dogleg_dist (default = 0 mm, which means the dogleg will be disabled):
 //          This wire model includes the ability to insert a single dogleg in the
-//          prebend segment of wiring (so in between the stripped end of the wire
+//          pre-bend segment of wiring (so in between the stripped end of the wire
 //          and the 90 degree bend). This is useful for controlling the routing
 //          of wires in a multi-wire harness. This parameter defines the distance
 //          of the start of the dogleg from the stripped segment of wire. 
-//      dogleg_offset (default = 0mm, dogleg disabled):
+//      dogleg_offset (default = 0 mm, dogleg disabled):
 //          This parameter defines how much offset (+ or -) from the primary wire
 //          center to perform at the distance defined above (dogleg_dist).
 //      insulation_color (default = "white"):
