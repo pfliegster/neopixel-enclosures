@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file. Major/Minor release tags match GitHub.
 
-## v0.2.0
+## [v0.2.0](https://github.com/pfliegster/neopixel-enclosures/releases/tag/v0.2.0)
 Updates to front/back enclosure module parameters for easier integration with other projects. Updated API (module parameters) should provide backward compatibility as reasonable defaults for new parameters are provided that closely match v0.1.0 constructs, but should be verified visually.
 
 #### Added
