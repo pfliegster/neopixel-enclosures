@@ -229,7 +229,7 @@ module neopixel_stick_case_back (
                     translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
                             -bottom_cover_height/2]) {
                         minkowski() {
-                            cube([jst4ph_socket_length,
+                            cube([wire_harness_opening_length,
                                 4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
                                 bottom_cover_height], center = true);
                             sphere(rounding_radius, $fn=80);
@@ -432,7 +432,7 @@ module neopixel_stick_case_back_on_mounting_plate (
                     translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
                             -bottom_cover_height/2]) {
                         minkowski() {
-                            cube([jst4ph_socket_length,
+                            cube([wire_harness_opening_length,
                                 4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
                                 bottom_cover_height], center = true);
                             sphere(rounding_radius, $fn=80);
@@ -472,7 +472,7 @@ module neopixel_stick_case_back_on_mounting_plate (
 module HarnessCutoutRegionExtended(length = 20) {
     translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2, -length/2]) {
         minkowski() {
-            cube([jst4ph_socket_length,
+            cube([wire_harness_opening_length,
                 4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
                 length], center = true);
             sphere(rounding_radius, $fn=80);
@@ -565,3 +565,6 @@ if ($include_back == undef) {
             m3_nut(outer_diameter = 6.4);
     }
 }
+
+// Set this here to indicate the design file is properly loaded and available.
+$neopixel_back_parts_are_available = true;

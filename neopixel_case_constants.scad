@@ -11,7 +11,6 @@
 // ****************************************************************************
 
 include <neopixel_x8_stick_constants.scad>
-include <wiring_harness_constants.scad>
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,6 +43,9 @@ cover_overlap_width = 1;
 cover_led_clearance = 0.6;
 
 // Computed constants useful for creation of front/back enclosure parts:
+wire_diam  = 1.6;
+wire_bend_r = 2;
+wire_harness_opening_length = 10;   // Equal to maximum Socket dimension (for JST4-PH connector)
 bottom_cover_base_height = pwb_height + wire_diam + wire_bend_r + cover_wall_thickness;
 top_cover_height = led_height + cover_overlap_depth - rounding_radius/2;
 front_surface_z = led_height + rounding_radius/2;

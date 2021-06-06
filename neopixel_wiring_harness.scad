@@ -38,22 +38,115 @@
 // ****************************************************************************
 
 include <neopixel_x8_stick_constants.scad>
-include <wiring_harness_constants.scad>
 
-// pre-bend wire length calculated to bring wires out of the back of the center of the pwb
-wire_len = pwb_length/2 - wire_bend_r - 0.5;
+// ****************************************************************************
+//
+// Module: wiring_harness()
+//      The Wiring Harness model uses the soldered_wire() module, which has several
+//      features for routing/visualization of the wiring to the NeoPixel PWB.
+//
+// Parameters:
+//      num_conductor (default = 4):
+//          only 3 or 4 conductor configurations supported.
+//      harness_length (default = 10mm):
+//          this defines the 'pigtail' length from the back of the PWB
+//          to the connector housing;
+//      connector_type (default = "unterminated"):
+//          set to either "socket" or "header" style, or as "unterminated".
+//          instantiation of the connector shell is useful for fit check for
+//          access hole in back case/cover piece in overall assembly.
+//
+// ****************************************************************************
 
-// X,Y offsets for harness wire connections, relative to board 0,0 origin:
-wire1_x = 0.5;
-wire2_x = wire1_x;
-wire3_x = wire1_x;
-wire1_y = pwb_pad_center_y1;
-wire2_y = wire1_y + pwb_pad_pitch_y;
-wire3_y = wire2_y + pwb_pad_pitch_y;
-// Wire #4 is only used in 4 conductor version of the wiring harness, when the DOUT signal is
-// required for daisy-chaining NeoPixel sticks together
-wire4_x = pwb_length - 0.5;
-wire4_y = wire3_y;
+module wiring_harness(num_conductor = 4, harness_length = 10, connector_type = "unterminated") {
+    
+    // First some error checking:
+    assert(harness_length >= 0);
+    assert(((num_conductor == 3) || (num_conductor == 4)),
+            "Only 3 or 4 conductor wiring harnesses supported at this time.");
+    assert(((connector_type == "socket") || (connector_type == "header") ||
+            (connector_type == "unterminated")),
+            "Unsupported connector_type. Check spelling.");
+
+    // JST-PH 3-pin socket (with interface segment) and header connector dimensions:
+    jst3ph_header_dimensions = [7.8, 4.3, 7.0];
+    jst3ph_socket_dimensions = [8.0, 4.7, 6.0];
+    jst3ph_socket_interface_dims = [6.6, 3.0, 6.6];
+
+    // JST-PH 4-pin socket (with interface segment) and header connector dimensions:
+    jst4ph_header_dimensions = [9.8, 4.4, 7.0];
+    jst4ph_socket_dimensions = [10.0, 4.7, 6.0];
+    jst4ph_socket_interface_dims = [8.6, 3.0, 6.6];
+
+    // Constants defining the wires comprising the harness itself:
+    wire_diam  = 1.6;
+    wire_bend_r = 2;
+    wire_strip_length = 3;
+    wire_solder_length = 1.5;
+    // pre-bend wire length calculated to bring wires out of the back of the center of the pwb
+    wire_len = pwb_length/2 - wire_bend_r - 0.5;
+
+    wire_color = ["black", "red", "white", "green"];
+    // X,Y,Z Position offsets for harness wire connections, relative to NeoPixel PWB 0,0 origin:
+    wire_offset = [ [0.5, pwb_pad_center_y1, -wire_diam/2.0],
+                    [0.5, pwb_pad_center_y1 + pwb_pad_pitch_y, -wire_diam/2.0],
+                    [0.5, pwb_pad_center_y1 + 2*pwb_pad_pitch_y, -wire_diam/2.0],
+                    // Note: Wire #4 (index 3) is only used in 4 conductor version of the wiring harness, 
+                    // when the DOUT signal isrequired for daisy-chaining NeoPixel sticks together:
+                    [pwb_length - 0.5, pwb_pad_center_y1 + 2*pwb_pad_pitch_y, -wire_diam/2.0] ];
+    dogleg_dist     = [ 5, 0, 5, 17];
+    dogleg_offset   = [ pwb_pad_pitch_y - wire_diam,
+                        0,
+                       -pwb_pad_pitch_y + wire_diam,
+                        pwb_pad_pitch_y-2*wire_diam ];
+                        
+    // Compute dimension vectors and translation offsets based on num_conductor parameter:
+    header_dimensions  = (num_conductor == 3) ? jst3ph_header_dimensions : jst4ph_header_dimensions;
+    socket_dimensions  = (num_conductor == 3) ? jst3ph_socket_dimensions : jst4ph_socket_dimensions;
+    interface_dims = (num_conductor == 3) ? jst3ph_socket_interface_dims : jst4ph_socket_interface_dims;
+
+    connector_x_offset = pwb_length/2;
+    connector_y_offset = (num_conductor == 3) ? wire_offset[1].y : wire_offset[1].y + wire_diam/2;
+    interface_z_offset = -(harness_length + wire_bend_r + wire_diam/2 + interface_dims.z/2);
+    socket_z_offset = interface_z_offset - interface_dims.z;
+    header_z_offset = -(harness_length + wire_bend_r + wire_diam/2 + header_dimensions.z/2);
+    
+    header_translate    = [connector_x_offset, connector_y_offset, header_z_offset];
+    socket_translate    = [connector_x_offset, connector_y_offset, socket_z_offset];
+    interface_translate = [connector_x_offset, connector_y_offset, interface_z_offset];
+
+    // Add the wires:
+    for (i = [ 0: num_conductor-1 ]) {
+        translate(wire_offset[i]) {
+            rotate([0, 90, (i==3) ? 180 : 0]) // Flip the 4th wire if present.
+                soldered_wire(prebend_length = wire_len - wire_strip_length,
+                    insulation_d = wire_diam,
+                    postbend_length = harness_length,
+                    soldered_length = wire_solder_length,
+                    stripped_length = wire_strip_length,
+                    bend_r = wire_bend_r,
+                    dogleg_dist = dogleg_dist[i],
+                    dogleg_offset = dogleg_offset[i],
+                    insulation_color = wire_color[i] );
+        }
+    }
+
+    // Next, add the connector backshell for socket or header harness termination:
+    if (connector_type == "socket") {
+        // Connector backshell (Socket style connection, which includes 'interface' section too):
+        color("white") {
+            translate(interface_translate)
+                rotate([0, 0, 90]) cube(interface_dims, center = true);
+            translate(socket_translate)
+                rotate([0, 0, 90]) cube(socket_dimensions, center = true);
+        }
+    } else if (connector_type == "header") {
+        // Connector backshell (Header style connection):
+        color("white") translate(header_translate)
+            rotate([0, 0, 90]) cube(header_dimensions, center = true);
+    } // else don't do anything for "unterminated" wiring harness
+
+}
 
 // ****************************************************************************
 //
@@ -247,127 +340,6 @@ module soldered_wire(
                 }
             }
         }
-    }
-}
-
-// ****************************************************************************
-//
-// Module: wiring_harness()
-//      The Wiring Harness model uses the soldered_wire() module, which has several
-//      features for routing/visualization of the wiring to the NeoPixel PWB.
-//
-// Parameters:
-//      num_conductor (default = 4):
-//          only 3 or 4 conductor configurations supported.
-//      harness_length (default = 10mm):
-//          this defines the 'pigtail' length from the back of the PWB
-//          to the connector housing;
-//      connector_type (default = "unterminated"):
-//          set to either "socket" or "header" style, or as "unterminated".
-//          instantiation of the connector shell is useful for fit check for
-//          access hole in back case/cover piece in overall assembly.
-//
-// ****************************************************************************
-
-module wiring_harness(num_conductor = 4, harness_length = 10, connector_type = "unterminated") {
-    
-    // First some error checking:
-    assert(harness_length >= 0);
-    assert(((num_conductor == 3) || (num_conductor == 4)),
-            "Only 3 or 4 conductor wiring harnesses supported at this time.");
-    assert(((connector_type == "socket") || (connector_type == "header") ||
-            (connector_type == "unterminated")),
-            "Unsupported connector_type. Check spelling.");
-    union() {
-        translate([wire1_x, wire1_y, -wire_diam/2.0]) {
-            rotate([0, 90, 0])
-                soldered_wire(prebend_length = wire_len - wire_strip_length,
-                    insulation_d = wire_diam,
-                    postbend_length = harness_length,
-                    soldered_length = wire_solder_length,
-                    stripped_length = wire_strip_length,
-                    dogleg_dist = 5.0, dogleg_offset = pwb_pad_pitch_y - wire_diam,
-                    bend_r = wire_bend_r, insulation_color = "black");
-        }
-        translate([wire2_x, wire2_y, -wire_diam/2.0]) {
-            rotate([0, 90, 0])
-                soldered_wire(prebend_length = wire_len - wire_strip_length,
-                    insulation_d = wire_diam,
-                    postbend_length = harness_length,
-                    soldered_length = wire_solder_length,
-                    stripped_length = wire_strip_length,
-                    bend_r = wire_bend_r, insulation_color = "red");
-        }
-        translate([wire3_x, wire3_y, -wire_diam/2.0]) {
-            rotate([0, 90, 0])
-                soldered_wire(prebend_length = wire_len - wire_strip_length,
-                    insulation_d = wire_diam,
-                    postbend_length = harness_length,
-                    soldered_length = wire_solder_length,
-                    stripped_length = wire_strip_length,
-                    dogleg_dist = 5.0, dogleg_offset = -pwb_pad_pitch_y + wire_diam,
-                    bend_r = wire_bend_r, insulation_color = "white");
-        }
-        
-        if (num_conductor == 4) {
-
-            // Add 4th wire to wire harness only if the parameter num_conductor = 4 is set:
-            translate([wire4_x, wire4_y, -wire_diam/2.0]) {
-                rotate([0, 90, 180])
-                    soldered_wire(prebend_length = wire_len - wire_strip_length,
-                        insulation_d = wire_diam,
-                        postbend_length = harness_length,
-                        soldered_length = wire_solder_length,
-                        stripped_length = wire_strip_length,
-                        dogleg_dist = 17.0, dogleg_offset = pwb_pad_pitch_y-2*wire_diam,
-                        bend_r = wire_bend_r, insulation_color = "green");
-            }
-
-            if (connector_type == "socket") {
-                // Connector backshell (Socket style connection, which includes 'interface' section too):
-                color("white") {
-                    translate([(pwb_length-jst4ph_inter_width)/2,
-                                wire2_y + wire_diam/2 - jst4ph_inter_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst4ph_inter_height])
-                        cube([jst4ph_inter_width, jst4ph_inter_length, jst4ph_inter_height]);
-                    translate([(pwb_length-jst4ph_socket_width)/2,
-                                wire2_y + wire_diam/2 - jst4ph_socket_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst4ph_inter_height-jst4ph_socket_height])
-                        cube([jst4ph_socket_width, jst4ph_socket_length, jst4ph_socket_height]);
-                }
-            } else if (connector_type == "header") {
-                // Connector backshell (Header style connection):
-                color("white") {
-                    translate([(pwb_length-jst4ph_header_width)/2,
-                                wire2_y + wire_diam/2 - jst4ph_header_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst4ph_header_height])
-                        cube([jst4ph_header_width, jst4ph_header_length, jst4ph_header_height]);
-                }
-            }
-        } else {  // 3-conductor Wire Harness (num_conductor == 3):
-            if (connector_type == "socket") {
-                // Connector backshell (Socket style connection, which includes 'interface' section too):
-                color("white") {
-                    translate([(pwb_length-jst3ph_inter_width)/2,
-                                wire2_y - jst3ph_inter_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst3ph_inter_height])
-                        cube([jst3ph_inter_width, jst3ph_inter_length, jst3ph_inter_height]);
-                    translate([(pwb_length-jst3ph_socket_width)/2,
-                                wire2_y - jst3ph_socket_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst3ph_inter_height-jst3ph_socket_height])
-                        cube([jst3ph_socket_width, jst3ph_socket_length, jst3ph_socket_height]);
-                }
-            } else if (connector_type == "header") {
-                // Connector backshell (Header style connection):
-                color("white") {
-                    translate([(pwb_length-jst3ph_header_width)/2,
-                                wire2_y + wire_diam/2 - jst3ph_header_length/2,
-                                -harness_length-wire_bend_r-(wire_diam/2)-jst3ph_header_height])
-                        cube([jst3ph_header_width, jst3ph_header_length, jst3ph_header_height]);
-                }
-            }
-        }
-
     }
 }
 

@@ -186,3 +186,6 @@ if ($include_front == undef) {
             test_align_shaft_1x10mm();
     }
 }
+
+// Set this here to indicate the design file is properly loaded and available.
+$neopixel_front_parts_are_available = true;
