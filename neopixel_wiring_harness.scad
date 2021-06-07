@@ -41,7 +41,7 @@ include <neopixel_x8_stick_constants.scad>
 
 // ****************************************************************************
 //
-// Module: wiring_harness()
+// Module: neopixel_wiring_harness()
 //      The Wiring Harness model uses the soldered_wire() module, which has several
 //      features for routing/visualization of the wiring to the NeoPixel PWB.
 //
@@ -58,7 +58,7 @@ include <neopixel_x8_stick_constants.scad>
 //
 // ****************************************************************************
 
-module wiring_harness(num_conductor = 4, harness_length = 10, connector_type = "unterminated") {
+module neopixel_wiring_harness(num_conductor = 4, harness_length = 10, connector_type = "unterminated") {
     
     // First some error checking:
     assert(harness_length >= 0);
@@ -350,5 +350,5 @@ module soldered_wire(
 //
 /////////////////////////////////////////////////////////////////
 if ($include_wiring_harness == undef) {
-    wiring_harness(num_conductor = 4, harness_length = 20, connector_type = "socket", $fn=80);
+    neopixel_wiring_harness(num_conductor = 4, harness_length = 20, connector_type = "socket", $fn=80);
 }

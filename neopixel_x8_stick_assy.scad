@@ -86,7 +86,7 @@ mtg_screw2_pos = [  0.69*pwb_length,
 union() {
     if ($include_pwb) pwb_model($fn=40);
     if ($include_wiring_harness)  translate([0, 0, wiring_harness_z]) {
-        wiring_harness(num_conductor = 4, harness_length = 20,
+        neopixel_wiring_harness(num_conductor = 4, harness_length = 20,
             connector_type = "socket", $fn=40);
     }
     if ($include_back)  translate([0, 0, enclosure_back_z]) {

@@ -536,10 +536,11 @@ if ($include_back == undef) {
             case_thickness = 10.25, clearance = 0.6, for_visualization = true);
     }
     if ($include_pwb) pwb_model($fn=40);
-    if ($include_wiring_harness) wiring_harness(
-        num_conductor = 4,
-        harness_length = 20,
-        connector_type = "socket", $fn=40);
+    if ($include_wiring_harness)
+        neopixel_wiring_harness(
+            num_conductor = 4,
+            harness_length = 20,
+            connector_type = "socket", $fn=40);
 
 *    HarnessCutoutRegionExtended(length = 20);
 *    MountingScrewsCutoutRegion(screw_depth = 20);

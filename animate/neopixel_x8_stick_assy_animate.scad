@@ -133,11 +133,11 @@ union() {
         if ($t > anim_t1) {
             translate([0, 0, ($t<anim_t2)?
                 anim_off_z2*(1 - ($t - anim_t1)/anim_delta2) : 0])
-                wiring_harness( num_conductor = 4, harness_length = 20,
+                neopixel_wiring_harness( num_conductor = 4, harness_length = 20,
                                 connector_type = "socket", $fn=40);
         } else if ($t > 0.75*anim_t1) {
             translate([0, 0, anim_off_z2])
-                wiring_harness( num_conductor = 4, harness_length = 20,
+                neopixel_wiring_harness( num_conductor = 4, harness_length = 20,
                                 connector_type = "socket", $fn=40);
         }
     }
