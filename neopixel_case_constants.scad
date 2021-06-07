@@ -255,49 +255,67 @@ module mounting_pegs(delta = 0, extra_back_thickness = 0) {
 //
 //  Parameters:
 //      screw_diam: Screw Diameter (e.g. set to 3.0 for M3 screw);
-//      head_type:  can be "none" (for fit check), "rounded" (panel or button heads), or 
-//                  "flat" (e.g. 90 deg. inset/flush-mount screws).
+//      screw_type: This can be "none (for fit check), "round" (panel or button heads), 
+//                  "cylinder" (socket head) or "flat" (e.g. 90 deg. flush-mount) screws.
+//      cutout_region: Boolean, set to true if using generic_screw_model() to create a
+//                  screw hole or other cutout_region (does not implement socket/screw
+//                  driver cutout).
 //      head_diam:  Widest diameter of head or 'flange' (the top of a "flat" head or
 //                  the bottom of "rounded" head types (panel, button, etc.), per convention.
 //      head_height: The height of rounded heads, or the inset depth of the flat head type.
 //      length:     Length of screw, from the bottom of the screw to either the
-//                  a) bottom of "rounded" head types, or
+//                  a) bottom of "round" and "cylinder" head types, or
 //                  b) top of "flat" head screws
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module generic_screw(screw_diam = 3.0, head_type = "rounded", head_diam = 6,
-                    head_height = 1.9, length = 8) {
+module generic_screw_model(screw_diam = 3.0, screw_type = "round", cutout_region = false,
+                    head_diam = 6, head_height = 1.9, length = 8) {
     // First, some error checking on parameters:
     assert(screw_diam > 0);
-    if (head_type != "none") {
-        assert(head_diam > 0);
-        assert(head_height > 0);
-    }
+    assert(head_diam > 0);
+    assert(head_height > 0);
     assert(length > 0);
-    assert(((head_type == "rounded") || (head_type == "flat") ||
-            (head_type == "none")),
-            "Unsupported head_type! Please check spelling.");
+    assert(((screw_type == "round") || (screw_type == "cylinder") ||
+            (screw_type == "none")  || (screw_type == "flat") ),
+            "Unsupported screw_type! Please check spelling.");
     
-    // Now let's create the screw shaft itself:
-    translate([0, 0, length/2])
-        cylinder(h = length, d = screw_diam, center = true);
-    // Next, create the screw head:
-    if (head_type == "rounded") { // for now, this is just approximated by a conical section
-        translate([0, 0, length + head_height/2])
-            cylinder(h = head_height, d1 = head_diam, d2 = head_diam/3, center = true);
-    } else if (head_type == "flat") {
-        translate([0, 0, length - head_height/2])
-            cylinder(h = head_height, d1 = screw_diam, d2 = head_diam, center = true);
+    difference() {
+        union() {
+            // Now let's create the screw shaft itself:
+            translate([0, 0, length/2])
+                cylinder(h = length, d = screw_diam, center = true);
+            // Next, create the screw head:
+            if (screw_type == "round") {
+                translate([0, 0, length]) {
+                    scale([1, 1, 2*head_height/head_diam]) {
+                        difference() {
+                            sphere(d = head_diam, $fn = 100);
+                            translate([0, 0, -head_diam/2]) cube(head_diam, center = true);
+                        }
+                    }
+                }
+            } else if (screw_type == "cylinder") {
+                translate([0, 0, length + head_height/2])
+                    cylinder(h = head_height, d = head_diam, center = true);
+            } else if (screw_type == "flat") {
+                translate([0, 0, length - head_height/2])
+                    cylinder(h = head_height, d1 = screw_diam, d2 = head_diam, center = true);
+            }
+        }
+        if (!cutout_region) {
+            translate([0, 0, (screw_type == "flat") ? length : length + head_height])
+                cylinder(h = head_height, d = screw_diam, center = true, $fn = 6);
+        }
     }
 }
 
 // Some pre-defined screws for use in the enclosure designs:
-module m3x8mm_panhead_screw()       generic_screw($fn=80); // This one just uses all the defaults :-)
-module m3x10mm_panhead_screw()      generic_screw(length = 10, $fn=80);
-module m3x10mm_flathead_screw()     generic_screw(head_type = "flat", head_height = 1.7, length = 10, $fn=80);
-module test_align_shaft_1x10mm()    generic_screw(screw_diam = 1, head_type = "none", length = 10, $fn=40);
-module m3_panhead_screw(length = 8) generic_screw(length = length, $fn=80);
-module m3_flathead_screw(length = 8) generic_screw(head_type = "flat", length = length, $fn=80);
+module m3x8mm_panhead_screw()       generic_screw_model($fn=80); // This one just uses all of the defaults :-)
+module m3x10mm_panhead_screw()      generic_screw_model(length = 10, $fn=80);
+module m3x10mm_flathead_screw()     generic_screw_model(screw_type = "flat", head_height = 1.7, length = 10, $fn=80);
+module test_align_shaft_1x10mm()    generic_screw_model(screw_diam = 1, screw_type = "none", length = 10, $fn=40);
+module m3_panhead_screw(length = 8)  generic_screw_model(length = length, $fn=80);
+module m3_flathead_screw(length = 8) generic_screw_model(screw_type = "flat", length = length, $fn=80);
 
 /////////////////////////////////////////////////////////////////
 //

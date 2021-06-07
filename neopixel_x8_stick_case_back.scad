@@ -259,11 +259,11 @@ module neopixel_stick_case_back (
                     
                     if (add_back_mounting_screws) {
                         translate([0.31*pwb_length, 0.43*pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
-                            generic_screw(screw_diam = 3.4, head_type = "flat",
+                            generic_screw_model(screw_diam = 3.4, screw_type = "flat", cutout_region = true,
                                 head_diam = 6.1, head_height = 2.1, length = mtg_screw_length, $fn=80);
                         }
                         translate([0.69*pwb_length, 0.43*pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
-                            generic_screw(screw_diam = 3.4, head_type = "flat",
+                            generic_screw_model(screw_diam = 3.4, screw_type = "flat", cutout_region = true,
                                 head_diam = 6.1, head_height = 2.1, length = mtg_screw_length, $fn=80);
                         }
                     }

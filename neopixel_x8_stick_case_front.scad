@@ -58,8 +58,8 @@ if ($include_front == undef) {
 //      screw_case: Set to true to build an enclosure that attaches front & back parts
 //                  with mounting screws (M3 screws and nuts); False yields the Simple
 //                  Enclosure type.
-//      screw_type: Can be "none" (default, for fit check), "rounded" (panel or button
-//                  heads), or "flat" (e.g. 90 deg. inset/flush-mount screws).
+//      screw_type: Can be "none" (default, for fit check), "round" (panel or button
+//                  heads), "cylinder" or "flat" (e.g. 90 deg. inset/flush-mount screws).
 //      case_screw_separation: Distance between the two case screws, center to center (for 
 //      front_alpha: Setting used for visualization of preview for assembly fit-check
 //                  or animation.
@@ -79,8 +79,8 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
             case_screw_separation = 60, front_alpha = 1.0) {
 
     if (screw_case) {
-        assert(((screw_type == "rounded") || (screw_type == "flat") ||
-                (screw_type == "none")),
+        assert(((screw_type == "round") || (screw_type == "flat") ||
+                (screw_type == "cylinder")  || (screw_type == "none")),
                 "Unsupported screw_type for enclosure mounting! Please check spelling.");
         assert(case_screw_separation > pwb_length + 6.0);
     }
@@ -146,12 +146,14 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
                     case_screw_length = 10;
                     translate([-case_screw_offset, pwb_width/2,
                         pwb_height + front_surface_z - case_screw_length])
-                        generic_screw(screw_diam = 3.4, head_type = screw_type,
-                            head_diam = 6.1, head_height = 2.0, length = case_screw_length, $fn=80);
+                        generic_screw_model(screw_diam = 3.4, screw_type = screw_type,
+                            head_diam = 6.1, head_height = 2.0,
+                            cutout_region = true, length = case_screw_length, $fn=80);
                     translate([pwb_length + case_screw_offset, pwb_width/2,
                         pwb_height + front_surface_z - case_screw_length])
-                        generic_screw(screw_diam = 3.4, head_type = screw_type,
-                        head_diam = 6.1, head_height = 2.0, length = case_screw_length, $fn=80);
+                        generic_screw_model(screw_diam = 3.4, screw_type = screw_type,
+                        head_diam = 6.1, head_height = 2.0,
+                        cutout_region = true, length = case_screw_length, $fn=80);
                 }
             }
         }

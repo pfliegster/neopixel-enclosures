@@ -34,7 +34,7 @@ include <../neopixel_wiring_harness.scad>
 
 // Set various enclosure options here:
 screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for simple enclosure
-screw_type = "flat";    // set enclosure screw type to "none", "rounded" or "flat"
+screw_type = "flat";    // set enclosure screw type to "none", "round", "cylinder" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
 case_screw_length = 10; // length of the physical mounting screws
 include_screws = true;  // include M3 screws for assembly visualization?
@@ -251,26 +251,32 @@ union() {
     if (include_screws) {
         color(c = [0.2, 0.2, 0.2] , alpha = 1.0) {
             if ($t > anim_s1_end) {
-                translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                translate(case_screw1_pos)
+                    generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
             } else if ($t >= anim_s1_start) {
                 translate([0, 0, anim_s1_z_offset*(1 - ($t - anim_s1_start)/anim_s1_delta)]) {
-                    translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw1_pos)
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
                 }
             } else if ($t >= anim_s1_viz) {
                 translate([0, 0, anim_s1_z_offset]) {
-                    translate(case_screw1_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw1_pos)
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
                 }
             }
 
             if ($t > anim_s2_end) {
-                translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                translate(case_screw2_pos)
+                    generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
             } else if ($t >= anim_s2_start) {
                 translate([0, 0, anim_s2_z_offset*(1 - ($t - anim_s2_start)/anim_s2_delta)]) {
-                    translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw2_pos)
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
                 }
             } else if ($t >= anim_s2_viz) {
                 translate([0, 0, anim_s2_z_offset]) {
-                    translate(case_screw2_pos) generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                    translate(case_screw2_pos)
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
                 }
             }
         }

@@ -41,7 +41,7 @@ _explode_view = false;
 
 // Set various enclosure options here:
 screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for simple enclosure
-screw_type = "flat";    // set enclosure screw type to "none", "rounded" or "flat"
+screw_type = "flat";    // set enclosure screw type to "none", "round", "cylinder" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
 front_alpha = 0.5;      // Set Alpha channel for color rendering of front enclosure part, aid in visualization
 back_alpha = 1.0;       // Set Alpha channel for color rendering of back enclosure part, aid in visualization
@@ -137,17 +137,17 @@ union() {
                 if (include_screws) {
                     // Align screw flanges with front of front enclosure piece:
                     translate(case_screw1_pos)
-                        generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
                     translate(case_screw2_pos)
-                        generic_screw(screw_diam = 2.9, head_type = screw_type, length = 10, $fn=80);
+                        generic_screw_model(screw_diam = 2.9, screw_type = screw_type, length = 10, $fn=80);
 
                     if (add_back_mounting_screws) {
                         translate(mtg_screw1_pos) {
-                            generic_screw(screw_diam = 2.9, head_type = screw_type,
+                            generic_screw_model(screw_diam = 2.9, screw_type = "flat",
                                 length = case_screw_length, $fn=80);
                         }
                         translate(mtg_screw2_pos) {
-                            generic_screw(screw_diam = 2.9, head_type = screw_type,
+                            generic_screw_model(screw_diam = 2.9, screw_type = "flat",
                                 length = case_screw_length, $fn=80);
                         }
                     }
