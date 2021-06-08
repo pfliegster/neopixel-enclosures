@@ -407,7 +407,7 @@ module enclosure_body_cutout(screw_case = true, case_screw_separation = 60,
                         cylinder(h = case_thickness, d = body_width, center = true, $fn=80);
                 // Right "Tab" cube/connection to main body:
                 translate([extra_dimension + ada_nps8_pwb_length + case_screw_offset/2,
-                    extra_dimension + pwb_width/2, case_thickness/2])
+                    extra_dimension + ada_nps8_pwb_width/2, case_thickness/2])
                         cube([case_screw_offset, body_width, case_thickness], center = true);
             }
         }
