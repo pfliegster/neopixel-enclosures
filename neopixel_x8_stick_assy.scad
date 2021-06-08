@@ -59,32 +59,32 @@ enclosure_screws_z = _explode_view ?  30: 0;
 enclosure_nuts_z   = _explode_view ? -25: 0;
 
 // Derived variables:
-case_screw_offset = (case_screw_separation - pwb_length)/2;
+case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 back_surface_z = case_thickness - front_surface_z;
 harness_pocket_depth = wire_diam + wire_bend_r;
 
 // Computed Positions for Mounting Hardware:
 case_screw1_pos = [  -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
-case_screw2_pos = [  pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height + front_surface_z - case_screw_length];
+case_screw2_pos = [  ada_nps8_pwb_length + case_screw_offset,
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height + front_surface_z - case_screw_length];
 case_nut1_pos = [    -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
-case_nut2_pos = [    pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
-mtg_screw1_pos = [  0.31*pwb_length,
-                    0.43*pwb_width,
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height - back_surface_z];
+case_nut2_pos = [    ada_nps8_pwb_length + case_screw_offset,
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height - back_surface_z];
+mtg_screw1_pos = [  0.31*ada_nps8_pwb_length,
+                    0.43*ada_nps8_pwb_width,
                     -(case_screw_length + harness_pocket_depth)];
-mtg_screw2_pos = [  0.69*pwb_length,
-                    0.43*pwb_width,
+mtg_screw2_pos = [  0.69*ada_nps8_pwb_length,
+                    0.43*ada_nps8_pwb_width,
                     -(case_screw_length + harness_pocket_depth)];
 
 union() {
-    if ($include_pwb) pwb_model($fn=40);
+    if ($include_pwb) ada_nps8_pwb_model($fn=40);
     if ($include_wiring_harness)  translate([0, 0, wiring_harness_z]) {
         neopixel_wiring_harness(num_conductor = 4, harness_length = 20,
             connector_type = "socket", $fn=40);

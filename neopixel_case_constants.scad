@@ -46,7 +46,7 @@ cover_led_clearance = 0.6;
 wire_diam  = 1.6;
 wire_bend_r = 2;
 wire_harness_opening_length = 10;   // Equal to maximum Socket dimension (for JST4-PH connector)
-bottom_cover_base_height = pwb_height + wire_diam + wire_bend_r + cover_wall_thickness;
+bottom_cover_base_height = ada_nps8_pwb_height + wire_diam + wire_bend_r + cover_wall_thickness;
 top_cover_height = led_height + cover_overlap_depth - rounding_radius/2;
 front_surface_z = led_height + rounding_radius/2;
 
@@ -96,39 +96,39 @@ module back_cover_body (
     
     // Compute the diameter of the extra "tab" material added to each side of the PWB
     // for the inclusion of mounting hardware for the screw-in version of the enclosure:
-    attach_tab_diameter = pwb_width + 2*cover_wall_thickness + delta;
+    attach_tab_diameter = ada_nps8_pwb_width + 2*cover_wall_thickness + delta;
 
     // Compute overall back enclosure part height from passed parameter:
     bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
 
     translate([ -cover_wall_thickness - delta/2,
                 -cover_wall_thickness - delta/2,
-                pwb_height - bottom_cover_height]) {
+                ada_nps8_pwb_height - bottom_cover_height]) {
         intersection() {
             minkowski() {
                 union() {
-                    cube([pwb_length + 2*cover_wall_thickness + delta,
-                        pwb_width + 2*cover_wall_thickness + delta, bottom_cover_height]);
+                    cube([ada_nps8_pwb_length + 2*cover_wall_thickness + delta,
+                        ada_nps8_pwb_width + 2*cover_wall_thickness + delta, bottom_cover_height]);
                     if (screw_case) {
                         // Left "Tab" cylindrical element:
                         translate([cover_wall_thickness + delta/2 - case_screw_offset,
-                            pwb_width/2 + cover_wall_thickness + delta/2,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + delta/2,
                             bottom_cover_height/2])
                                 cylinder(h = bottom_cover_height, d = attach_tab_diameter,
                                     center = true, $fn=80);
                         // Left "Tab" cube/connection to main body:
                         translate([cover_wall_thickness + delta/2 - case_screw_offset/2,
-                            pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
                                 cube([case_screw_offset, attach_tab_diameter, bottom_cover_height],
                                     center = true);
                         // Right "Tab" cylindrical element:
-                        translate([cover_wall_thickness + delta/2 + pwb_length + case_screw_offset,
-                            pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
+                        translate([cover_wall_thickness + delta/2 + ada_nps8_pwb_length + case_screw_offset,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
                                 cylinder(h = bottom_cover_height, d = attach_tab_diameter,
                                     center = true, $fn=80);
                         // Right "Tab" cube/connection to main body:
-                        translate([cover_wall_thickness + delta/2 + pwb_length + case_screw_offset/2,
-                            pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
+                        translate([cover_wall_thickness + delta/2 + ada_nps8_pwb_length + case_screw_offset/2,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + delta/2, bottom_cover_height/2])
                                 cube([case_screw_offset, attach_tab_diameter, bottom_cover_height],
                                     center = true);
                     }
@@ -136,8 +136,8 @@ module back_cover_body (
                 sphere(rounding_radius, $fn=80);
             }
             // intersect with this larger, shifted cube to give it a flat top:
-            translate([ -case_screw_offset - pwb_length/2, -pwb_width/2, -remove_extra_height - 3*rounding_radius])
-                cube([  2*pwb_length + 2*case_screw_offset, 3*pwb_width,
+            translate([ -case_screw_offset - ada_nps8_pwb_length/2, -ada_nps8_pwb_width/2, -remove_extra_height - 3*rounding_radius])
+                cube([  2*ada_nps8_pwb_length + 2*case_screw_offset, 3*ada_nps8_pwb_width,
                         bottom_cover_height + 3*rounding_radius]);
         }
     }
@@ -165,37 +165,37 @@ module front_cover_body(screw_case = true, case_screw_offset = 4.6) {
 
     // Compute the diameter of the extra "tab" material added to each side of the PWB
     // for the inclusion of mounting hardware for the screw-in version of the enclosure:
-    attach_tab_diameter = pwb_width + 2*cover_wall_thickness + 2*cover_overlap_width;
+    attach_tab_diameter = ada_nps8_pwb_width + 2*cover_wall_thickness + 2*cover_overlap_width;
 
     translate([ -cover_wall_thickness - cover_overlap_width,
                 -cover_wall_thickness - cover_overlap_width,
-                pwb_height - cover_overlap_depth]) {
+                ada_nps8_pwb_height - cover_overlap_depth]) {
         difference() {
             minkowski() {
                 union() {
-                    cube([pwb_length + 2*cover_wall_thickness + 2*cover_overlap_width,
-                        pwb_width + 2*cover_wall_thickness + 2*cover_overlap_width,
+                    cube([ada_nps8_pwb_length + 2*cover_wall_thickness + 2*cover_overlap_width,
+                        ada_nps8_pwb_width + 2*cover_wall_thickness + 2*cover_overlap_width,
                         top_cover_height]);
                     if (screw_case) {
                         // Left "Tab" cylindrical element:
                         translate([cover_wall_thickness + cover_overlap_width - case_screw_offset,
-                            pwb_width/2 + cover_wall_thickness + cover_overlap_width,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + cover_overlap_width,
                             top_cover_height/2])
                                 cylinder(h = top_cover_height, d = attach_tab_diameter, center = true, $fn=80);
                         // Left "Tab" cube/connection to main body:
                         translate([cover_wall_thickness + cover_overlap_width - case_screw_offset/2,
-                            pwb_width/2 + cover_wall_thickness + cover_overlap_width,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + cover_overlap_width,
                             top_cover_height/2])
                                 cube([case_screw_offset, attach_tab_diameter, top_cover_height],
                                     center = true);
                         // Right "Tab" cylindrical element:
-                        translate([pwb_length + cover_wall_thickness + cover_overlap_width + case_screw_offset,
-                            pwb_width/2 + cover_wall_thickness + cover_overlap_width,
+                        translate([ada_nps8_pwb_length + cover_wall_thickness + cover_overlap_width + case_screw_offset,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + cover_overlap_width,
                             top_cover_height/2])
                                 cylinder(h = top_cover_height, d = attach_tab_diameter, center = true, $fn=80);
                         // Right "Tab" cube/connection to main body:
-                        translate([cover_wall_thickness + cover_overlap_width + pwb_length + case_screw_offset/2,
-                            pwb_width/2 + cover_wall_thickness + cover_overlap_width,
+                        translate([cover_wall_thickness + cover_overlap_width + ada_nps8_pwb_length + case_screw_offset/2,
+                            ada_nps8_pwb_width/2 + cover_wall_thickness + cover_overlap_width,
                             top_cover_height/2])
                                 cube([case_screw_offset, attach_tab_diameter, top_cover_height],
                                     center = true);
@@ -203,8 +203,8 @@ module front_cover_body(screw_case = true, case_screw_offset = 4.6) {
                 }
                 sphere(rounding_radius, $fn=80);
             }
-            translate([ -case_screw_offset - pwb_length/2, -pwb_width/2, -3*rounding_radius])
-                cube([2*pwb_length + 2*case_screw_offset, 3*pwb_width, 3*rounding_radius]);
+            translate([ -case_screw_offset - ada_nps8_pwb_length/2, -ada_nps8_pwb_width/2, -3*rounding_radius])
+                cube([2*ada_nps8_pwb_length + 2*case_screw_offset, 3*ada_nps8_pwb_width, 3*rounding_radius]);
         }
     }
 }
@@ -236,17 +236,17 @@ module mounting_pegs(delta = 0, extra_back_thickness = 0) {
     bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
         
     translate([pwb_hole1_x, pwb_hole1_y,
-                pwb_height + (peg_extension - bottom_cover_height)/2])
+                ada_nps8_pwb_height + (peg_extension - bottom_cover_height)/2])
         cylinder(h = bottom_cover_height + peg_extension,
                 r = pwb_hole1_r + delta - mtg_peg_margin/2, center = true);
-    translate([pwb_hole1_x, pwb_hole1_y, (pwb_height-bottom_cover_height)/2])
-        cylinder(h = bottom_cover_height - pwb_height, r = pwb_hole1_r + 0.5, center = true);
+    translate([pwb_hole1_x, pwb_hole1_y, (ada_nps8_pwb_height-bottom_cover_height)/2])
+        cylinder(h = bottom_cover_height - ada_nps8_pwb_height, r = pwb_hole1_r + 0.5, center = true);
     translate([pwb_hole2_x, pwb_hole2_y,
-                pwb_height + (peg_extension - bottom_cover_height)/2])
+                ada_nps8_pwb_height + (peg_extension - bottom_cover_height)/2])
         cylinder(h = bottom_cover_height  + peg_extension,
                 r = pwb_hole2_r + delta - mtg_peg_margin/2, center = true);
-    translate([pwb_hole2_x, pwb_hole2_y, (pwb_height-bottom_cover_height)/2])
-        cylinder(h = bottom_cover_height - pwb_height, r = pwb_hole2_r + 0.5, center = true);
+    translate([pwb_hole2_x, pwb_hole2_y, (ada_nps8_pwb_height-bottom_cover_height)/2])
+        cylinder(h = bottom_cover_height - ada_nps8_pwb_height, r = pwb_hole2_r + 0.5, center = true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -373,8 +373,8 @@ module enclosure_body_cutout(screw_case = true, case_screw_separation = 60,
 
     // First some error checking and variable computation:
     assert(clearance >= 0);
-    if (screw_case) assert(case_screw_separation > pwb_length + 6.0);
-    case_screw_offset = (case_screw_separation - pwb_length)/2;
+    if (screw_case) assert(case_screw_separation > ada_nps8_pwb_length + 6.0);
+    case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 
     minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
     assert(case_thickness >= minimum_case_thickness);
@@ -385,28 +385,28 @@ module enclosure_body_cutout(screw_case = true, case_screw_separation = 60,
     // Compute the diameter of the extra "tab" material added to each side of the PWB
     // for the inclusion of mounting hardware for the screw-in version of the enclosure:
     extra_dimension = cover_wall_thickness + cover_overlap_width + rounding_radius + clearance;
-    body_length = pwb_length + 2*extra_dimension;
-    body_width  = pwb_width + 2*extra_dimension;
+    body_length = ada_nps8_pwb_length + 2*extra_dimension;
+    body_width  = ada_nps8_pwb_width + 2*extra_dimension;
 
     translate([ -extra_dimension, -extra_dimension,
-                pwb_height - bottom_cover_height - rounding_radius]) {
+                ada_nps8_pwb_height - bottom_cover_height - rounding_radius]) {
         union() {
             cube([body_length, body_width, case_thickness]);
             if (screw_case) {
                 // Left "Tab" cylindrical element:
                 translate([extra_dimension - case_screw_offset,
-                    extra_dimension + pwb_width/2, case_thickness/2])
+                    extra_dimension + ada_nps8_pwb_width/2, case_thickness/2])
                         cylinder(h = case_thickness, d = body_width, center = true, $fn=80);
                 // Left "Tab" cube/connection to main body:
                 translate([extra_dimension - case_screw_offset/2,
-                    extra_dimension + pwb_width/2, case_thickness/2])
+                    extra_dimension + ada_nps8_pwb_width/2, case_thickness/2])
                         cube([case_screw_offset, body_width, case_thickness], center = true);
                 // Right "Tab" cylindrical element:
-                translate([extra_dimension + pwb_length + case_screw_offset,
-                    extra_dimension + pwb_width/2, case_thickness/2])
+                translate([extra_dimension + ada_nps8_pwb_length + case_screw_offset,
+                    extra_dimension + ada_nps8_pwb_width/2, case_thickness/2])
                         cylinder(h = case_thickness, d = body_width, center = true, $fn=80);
                 // Right "Tab" cube/connection to main body:
-                translate([extra_dimension + pwb_length + case_screw_offset/2,
+                translate([extra_dimension + ada_nps8_pwb_length + case_screw_offset/2,
                     extra_dimension + pwb_width/2, case_thickness/2])
                         cube([case_screw_offset, body_width, case_thickness], center = true);
             }

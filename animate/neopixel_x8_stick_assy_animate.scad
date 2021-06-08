@@ -44,22 +44,22 @@ case_screw_separation = 60.0;     // Center-to-Center distance of the two case m
 add_back_mounting_screws = false; // Add Mounting screws to back enclosure part
 
 // Derived variables:
-case_screw_offset = (case_screw_separation - pwb_length)/2;
+case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 back_surface_z = case_thickness - front_surface_z;
 
 // Computed Positions for Mounting Hardware:
 case_screw1_pos = [  -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
-case_screw2_pos = [  pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height + front_surface_z - case_screw_length];
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height + front_surface_z - case_screw_length];
+case_screw2_pos = [  ada_nps8_pwb_length + case_screw_offset,
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height + front_surface_z - case_screw_length];
 case_nut1_pos = [    -case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
-case_nut2_pos = [    pwb_length + case_screw_offset,
-                    pwb_width/2,
-                    pwb_height - back_surface_z];
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height - back_surface_z];
+case_nut2_pos = [    ada_nps8_pwb_length + case_screw_offset,
+                    ada_nps8_pwb_width/2,
+                    ada_nps8_pwb_height - back_surface_z];
 
 // The constants which will drive the various animation steps:
 // Start with display of PWB Only
@@ -126,7 +126,7 @@ anim_n2_z_offset = -13;
 
 union() {
     // The PWB is always there and stationary:
-    if ($include_pwb) pwb_model($fn=40);
+    if ($include_pwb) ada_nps8_pwb_model($fn=40);
 
     // Animate the Wiring Harness Model:
     if ($include_wiring_harness) {
@@ -157,9 +157,9 @@ union() {
                     back_alpha = 1.0
                 );
         } else if ($t > anim_t4) {
-            translate([pwb_length/2, pwb_width/2, 0]) {
+            translate([ada_nps8_pwb_length/2, ada_nps8_pwb_width/2, 0]) {
                 rotate([0, 0, ($t<anim_t5)? anim_rot_z5*(1 - ($t - anim_t4)/anim_delta5) : 0]) {
-                    translate([-pwb_length/2, -pwb_width/2, 
+                    translate([-ada_nps8_pwb_length/2, -ada_nps8_pwb_width/2, 
                         (anim_off_z5-anim_off_z6)*(1 - ($t - anim_t4)/anim_delta5) + anim_off_z6])
                         neopixel_stick_case_back (
                             screw_case = screw_case,
@@ -174,9 +174,9 @@ union() {
                 }
             }
         } else if ($t > anim_t3) {
-            translate([pwb_length/2, pwb_width/2, 0]) {
+            translate([ada_nps8_pwb_length/2, ada_nps8_pwb_width/2, 0]) {
                 rotate([0, 0, anim_rot_z4]) {
-                    translate([-pwb_length/2, -pwb_width/2, 
+                    translate([-ada_nps8_pwb_length/2, -ada_nps8_pwb_width/2, 
                         (anim_off_z4-anim_off_z5)*(1 - ($t - anim_t3)/anim_delta4) + anim_off_z5])
                         neopixel_stick_case_back (
                             screw_case = screw_case,
@@ -191,9 +191,9 @@ union() {
                 }
             }
         } else if ($t > anim_t2 + 0.75*anim_delta3) {
-            translate([pwb_length/2, pwb_width/2, 0]) {
+            translate([ada_nps8_pwb_length/2, ada_nps8_pwb_width/2, 0]) {
                 rotate([0, 0, anim_rot_z3]) {
-                    translate([-pwb_length/2, -pwb_width/2, anim_off_z3])
+                    translate([-ada_nps8_pwb_length/2, -ada_nps8_pwb_width/2, anim_off_z3])
                         neopixel_stick_case_back (
                             screw_case = screw_case,
                             case_screw_separation = case_screw_separation,

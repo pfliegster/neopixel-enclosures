@@ -153,8 +153,8 @@ module neopixel_stick_case_back (
     echo("Min Thickness = ", minimum_case_thickness);
     back_surface_z = case_thickness - front_surface_z;
 
-    if (screw_case) assert(case_screw_separation > pwb_length + 6.0);
-    case_screw_offset = (case_screw_separation - pwb_length)/2;
+    if (screw_case) assert(case_screw_separation > ada_nps8_pwb_length + 6.0);
+    case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 
     harness_pocket_depth = wire_diam + wire_bend_r;
                 
@@ -166,7 +166,7 @@ module neopixel_stick_case_back (
 
     color("dimgray", alpha = back_alpha) {
         // Compute translation vector if user sets 'xy_center' == true:
-        xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+        xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
         
         translate(xy_origin_translation) {
             render() difference() {
@@ -187,40 +187,40 @@ module neopixel_stick_case_back (
                 union() {
                     // Pocket for the PWB to sit in, with a little bit of margin around PWB edges:
                     translate([-pwb_pocket_margin, -pwb_pocket_margin, 0])
-                        cube([pwb_length + 2*pwb_pocket_margin,
-                            pwb_width + 2*pwb_pocket_margin, pwb_height]);
+                        cube([ada_nps8_pwb_length + 2*pwb_pocket_margin,
+                            ada_nps8_pwb_width + 2*pwb_pocket_margin, ada_nps8_pwb_height]);
 
                     // Another pocket to allow for wire thickness using 'lip' constants,
                     // so the PWB will sit on the edges:
                     translate([pwb_lip_sides, pwb_lip_bottom + pwb_lip_bottom_indent,
                             -harness_pocket_depth])
-                        cube([pwb_length - 2*pwb_lip_sides,
-                            pwb_width - pwb_lip_bottom - pwb_lip_bottom_indent - pwb_lip_top,
+                        cube([ada_nps8_pwb_length - 2*pwb_lip_sides,
+                            ada_nps8_pwb_width - pwb_lip_bottom - pwb_lip_bottom_indent - pwb_lip_top,
                             harness_pocket_depth]);
 
                     // Another cutout to allow for clearance around wire #1:
                     translate([pwb_lip_sides, pwb_lip_bottom, -harness_pocket_depth])
                         cube([pwb_lip_bottom_indent_dist,
-                            pwb_width - pwb_lip_bottom - pwb_lip_top,
+                            ada_nps8_pwb_width - pwb_lip_bottom - pwb_lip_top,
                             harness_pocket_depth]);
 
                     // Another cutout to allow for clearance around wire #4 at 90 degree bend:
                     translate([pwb_lip_top_outdent_dist + pwb_lip_sides,
-                            pwb_width - pwb_lip_top, -harness_pocket_depth])
-                        cube([pwb_length - 2*pwb_lip_top_outdent_dist - 2*pwb_lip_sides,
+                            ada_nps8_pwb_width - pwb_lip_top, -harness_pocket_depth])
+                        cube([ada_nps8_pwb_length - 2*pwb_lip_top_outdent_dist - 2*pwb_lip_sides,
                             pwb_lip_top_outdent,
                             harness_pocket_depth]);
                             
                     // Cut corners for internal, convex, vertical pocket corners
                     translate([pwb_lip_top_outdent_dist + pwb_lip_sides,
-                            pwb_width - pwb_lip_top, -harness_pocket_depth/2]) {
+                            ada_nps8_pwb_width - pwb_lip_top, -harness_pocket_depth/2]) {
                         rotate([0, 0, 45]) {
                             cube([2*pwb_lip_top_outdent/sqrt(2), 2*pwb_lip_top_outdent/sqrt(2),
                                 harness_pocket_depth], center=true);
                         }
                     }
-                    translate([pwb_length - pwb_lip_top_outdent_dist - pwb_lip_sides,
-                            pwb_width - pwb_lip_top, -harness_pocket_depth/2]) {
+                    translate([ada_nps8_pwb_length - pwb_lip_top_outdent_dist - pwb_lip_sides,
+                            ada_nps8_pwb_width - pwb_lip_top, -harness_pocket_depth/2]) {
                         rotate([0, 0, 45]) {
                             cube([2*pwb_lip_top_outdent/sqrt(2), 2*pwb_lip_top_outdent/sqrt(2),
                                 harness_pocket_depth], center=true);
@@ -235,7 +235,7 @@ module neopixel_stick_case_back (
                     }
 
                     // Cutout through back of case for wire harness:
-                    translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
+                    translate([ada_nps8_pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
                             -bottom_cover_height/2]) {
                         minkowski() {
                             cube([wire_harness_opening_length,
@@ -247,16 +247,16 @@ module neopixel_stick_case_back (
                     // Drill holes through the model for screws and cutout pockets for nuts
                     // for screw together variant of enclosure:
                     if (screw_case) {
-                        translate([-case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                        translate([-case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height - screw_depth/2])
                             cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
-                        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                        translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height - screw_depth/2])
                             cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
                         if (include_nut_pocket) {
-                            translate([-case_screw_offset, pwb_width/2,
-                                pwb_height + nut_pocket_depth/2 - back_surface_z])
+                            translate([-case_screw_offset, ada_nps8_pwb_width/2,
+                                ada_nps8_pwb_height + nut_pocket_depth/2 - back_surface_z])
                                 cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
-                            translate([pwb_length + case_screw_offset, pwb_width/2,
-                                pwb_height + nut_pocket_depth/2 - back_surface_z])
+                            translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2,
+                                ada_nps8_pwb_height + nut_pocket_depth/2 - back_surface_z])
                                 cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
                         }
                     }
@@ -267,11 +267,11 @@ module neopixel_stick_case_back (
                                  // without a slight adjustment in OpenSCAD
                     
                     if (add_back_mounting_screws) {
-                        translate([0.31*pwb_length, 0.43*pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
+                        translate([0.31*ada_nps8_pwb_length, 0.43*ada_nps8_pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
                             generic_screw_model(screw_diam = 3.4, screw_type = "flat", cutout_region = true,
                                 head_diam = 6.1, head_height = 2.1, length = mtg_screw_length, $fn=80);
                         }
-                        translate([0.69*pwb_length, 0.43*pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
+                        translate([0.69*ada_nps8_pwb_length, 0.43*ada_nps8_pwb_width, ff - (mtg_screw_length + harness_pocket_depth)]) {
                             generic_screw_model(screw_diam = 3.4, screw_type = "flat", cutout_region = true,
                                 head_diam = 6.1, head_height = 2.1, length = mtg_screw_length, $fn=80);
                         }
@@ -342,8 +342,8 @@ module neopixel_stick_case_back_on_mounting_plate (
         back_alpha = 1.0) {
             
     // First some error checking and variable computation:
-    assert(case_screw_separation > pwb_length + 6.0);
-    case_screw_offset = (case_screw_separation - pwb_length)/2;
+    assert(case_screw_separation > ada_nps8_pwb_length + 6.0);
+    case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 
     case_thickness = mounting_plate_thickness + cover_overlap_depth + front_surface_z;
     minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
@@ -376,52 +376,52 @@ module neopixel_stick_case_back_on_mounting_plate (
                         extra_back_thickness = extra_back_thickness,
                         remove_extra_height = cover_overlap_depth);
                     // Add Mounting Plate Body:
-                    translate([(pwb_length - mounting_plate_length)/2,
-                        pwb_width + cover_wall_thickness + cover_overlap_width + rounding_radius - mounting_plate_width,
-                        pwb_height - back_surface_z]) {
+                    translate([(ada_nps8_pwb_length - mounting_plate_length)/2,
+                        ada_nps8_pwb_width + cover_wall_thickness + cover_overlap_width + rounding_radius - mounting_plate_width,
+                        ada_nps8_pwb_height - back_surface_z]) {
                         cube([mounting_plate_length, mounting_plate_width-5, mounting_plate_thickness]);
                         }
                 }
                 union() {
                     // Pocket for the PWB to sit in, with a little bit of margin around PWB edges:
                     translate([-pwb_pocket_margin, -pwb_pocket_margin, 0])
-                        cube([pwb_length + 2*pwb_pocket_margin,
-                            pwb_width + 2*pwb_pocket_margin, pwb_height]);
+                        cube([ada_nps8_pwb_length + 2*pwb_pocket_margin,
+                            ada_nps8_pwb_width + 2*pwb_pocket_margin, ada_nps8_pwb_height]);
 
                     // Another pocket to allow for wire thickness using 'lip' constants,
                     // so the PWB will sit on the edges:
                     translate([pwb_lip_sides,
                             pwb_lip_bottom + pwb_lip_bottom_indent,
                             -wire_diam - wire_bend_r])
-                        cube([pwb_length - 2*pwb_lip_sides,
-                            pwb_width - pwb_lip_bottom - pwb_lip_bottom_indent - pwb_lip_top,
+                        cube([ada_nps8_pwb_length - 2*pwb_lip_sides,
+                            ada_nps8_pwb_width - pwb_lip_bottom - pwb_lip_bottom_indent - pwb_lip_top,
                             wire_diam + wire_bend_r]);
 
                     // Another cutout to allow for clearance around wire #1:
                     translate([pwb_lip_sides, pwb_lip_bottom, -wire_diam - wire_bend_r])
                         cube([pwb_lip_bottom_indent_dist,
-                            pwb_width - pwb_lip_bottom - pwb_lip_top,
+                            ada_nps8_pwb_width - pwb_lip_bottom - pwb_lip_top,
                             wire_diam + wire_bend_r]);
 
                     // Another cutout to allow for clearance around wire #4 at 90 degree bend:
                     translate([pwb_lip_top_outdent_dist + pwb_lip_sides,
-                            pwb_width - pwb_lip_top,
+                            ada_nps8_pwb_width - pwb_lip_top,
                             -wire_diam - wire_bend_r])
-                        cube([pwb_length - 2*pwb_lip_top_outdent_dist - 2*pwb_lip_sides,
+                        cube([ada_nps8_pwb_length - 2*pwb_lip_top_outdent_dist - 2*pwb_lip_sides,
                             pwb_lip_top_outdent,
                             wire_diam + wire_bend_r]);
                             
                     // Cut corners for internal, convex, vertical pocket corners
                     translate([pwb_lip_top_outdent_dist + pwb_lip_sides,
-                            pwb_width - pwb_lip_top, -(wire_diam + wire_bend_r)/2]) {
+                            ada_nps8_pwb_width - pwb_lip_top, -(wire_diam + wire_bend_r)/2]) {
                         rotate([0, 0, 45]) {
                             cube([2*pwb_lip_top_outdent/sqrt(2),
                                 2*pwb_lip_top_outdent/sqrt(2),
                                 wire_diam + wire_bend_r], center=true);
                         }
                     }
-                    translate([pwb_length - pwb_lip_top_outdent_dist - pwb_lip_sides,
-                            pwb_width - pwb_lip_top, -(wire_diam + wire_bend_r)/2]) {
+                    translate([ada_nps8_pwb_length - pwb_lip_top_outdent_dist - pwb_lip_sides,
+                            ada_nps8_pwb_width - pwb_lip_top, -(wire_diam + wire_bend_r)/2]) {
                         rotate([0, 0, 45]) {
                             cube([2*pwb_lip_top_outdent/sqrt(2),
                                 2*pwb_lip_top_outdent/sqrt(2),
@@ -438,7 +438,7 @@ module neopixel_stick_case_back_on_mounting_plate (
                     }
 
                     // Cutout through back of case for wire harness:
-                    translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
+                    translate([ada_nps8_pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2,
                             -bottom_cover_height/2]) {
                         minkowski() {
                             cube([wire_harness_opening_length,
@@ -449,16 +449,16 @@ module neopixel_stick_case_back_on_mounting_plate (
                     }
                     // Drill holes through the model for screws and cutout pockets for nuts
                     // for screw together variant of enclosure:
-                    translate([-case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                    translate([-case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height - screw_depth/2])
                         cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
-                    translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height - screw_depth/2])
+                    translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height - screw_depth/2])
                         cylinder(h = screw_depth, d = screw_hole_diameter, center = true, $fn=80);
                     if (include_nut_pocket) {
-                        translate([-case_screw_offset, pwb_width/2,
-                            pwb_height + nut_pocket_depth/2 - back_surface_z])
+                        translate([-case_screw_offset, ada_nps8_pwb_width/2,
+                            ada_nps8_pwb_height + nut_pocket_depth/2 - back_surface_z])
                             cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
-                        translate([pwb_length + case_screw_offset, pwb_width/2,
-                            pwb_height + nut_pocket_depth/2 - back_surface_z])
+                        translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2,
+                            ada_nps8_pwb_height + nut_pocket_depth/2 - back_surface_z])
                             cylinder(h = nut_pocket_depth, d = 7, center = true, $fn=6);
                     }
                 }
@@ -480,10 +480,10 @@ module neopixel_stick_case_back_on_mounting_plate (
 
 module HarnessCutoutRegionExtended(length = 20, xy_center = false) {
     // Compute translation vector if user sets 'xy_center' == true:
-    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+    xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
 
     translate(xy_origin_translation) {
-        translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2, -length/2]) {
+        translate([ada_nps8_pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2, -length/2]) {
             minkowski() {
                 cube([wire_harness_opening_length,
                     4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
@@ -501,16 +501,16 @@ module MountingScrewsCutoutRegion(screw_depth = 20, xy_center = false, case_thic
     back_surface_z = case_thickness - front_surface_z;
 
     // Compute translation vector if user sets 'xy_center' == true:
-    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+    xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
 
     translate(xy_origin_translation) {
         extra_stub = 6;
-        translate([0.31*pwb_length, 0.43*pwb_width,
-            pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
+        translate([0.31*ada_nps8_pwb_length, 0.43*ada_nps8_pwb_width,
+            ada_nps8_pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
                 cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
         }
-        translate([0.69*pwb_length, 0.43*pwb_width,
-            pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
+        translate([0.69*ada_nps8_pwb_length, 0.43*ada_nps8_pwb_width,
+            ada_nps8_pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
                 cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
         }
     }
@@ -528,7 +528,7 @@ module NeopixelCaseCutoutRegion(screw_case = true,
             for_visualization = false ) {
 
     // Compute translation vector if user sets 'xy_center' == true:
-    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+    xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
 
     translate(xy_origin_translation) {
         if (for_visualization) {
@@ -561,7 +561,7 @@ if ($include_back == undef) {
         NeopixelCaseCutoutRegion(screw_case = true, case_screw_separation = 60,
             case_thickness = 10.25, clearance = 0.6, for_visualization = true);
     }
-    if ($include_pwb) pwb_model($fn=40);
+    if ($include_pwb) ada_nps8_pwb_model($fn=40);
     if ($include_wiring_harness)
         neopixel_wiring_harness(
             num_conductor = 4,
@@ -577,18 +577,18 @@ if ($include_back == undef) {
         case_thickness = 10.25;
         case_screw_length = 10;
         case_screw_separation = 60;
-        case_screw_offset = (case_screw_separation - pwb_length)/2;
+        case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
         back_surface_z = case_thickness - front_surface_z;
 
         // Align screw flanges with front of front enclosure piece:
-        translate([-case_screw_offset, pwb_width/2, pwb_height + front_surface_z - case_screw_length])
+        translate([-case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height + front_surface_z - case_screw_length])
             test_align_shaft_1x10mm();
-        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height + front_surface_z - case_screw_length])
+        translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height + front_surface_z - case_screw_length])
             test_align_shaft_1x10mm();
         // Align nuts with back of back enclosure piece (set into inset nut pocket):
-        translate([-case_screw_offset, pwb_width/2, pwb_height - back_surface_z])
+        translate([-case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height - back_surface_z])
             m3_nut(outer_diameter = 6.4);
-        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height - back_surface_z])
+        translate([pwb_length + case_screw_offset, pwb_width/2, ada_nps8_pwb_height - back_surface_z])
             m3_nut(outer_diameter = 6.4);
     }
 }

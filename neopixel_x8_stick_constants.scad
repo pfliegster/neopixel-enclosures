@@ -20,9 +20,9 @@
 // ****************************************************************************
 
 // Raw PWB Dimensions:
-pwb_length = 50.8;
-pwb_width = 10.16;
-pwb_height = 1.5;
+ada_nps8_pwb_length = 50.8;
+ada_nps8_pwb_width = 10.16;
+ada_nps8_pwb_height = 1.5;
 
 // Mounting Holes:
 pwb_hole1_x = 12.7;

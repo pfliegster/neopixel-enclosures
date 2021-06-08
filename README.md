@@ -16,7 +16,8 @@ OpenSCAD design file notes:
 1. All units in mm.
 2. Reference level Z=0 is the bottom surface of the NeoPixel Stick PWB, where it sits on the perimeter *lip* of the enclosure back model piece.
 3. Similarly, the [X, Y] = [0, 0] origin of the model is the bottom left corner of the PWB, which matches that of Adafruit's EagleCAD design origin.
-4. Some design files do use advanced features of OpenSCAD (such as *rotate_extrude()*), so a fairly recent version of OpenSCAD will be required. Models in the repository have been tested using OpenSCAD v. 2021.01 and 2019.05
+4. [X, Y] origin can be translated on most modules to be centered on the NeoPixel Stick PWB center instead of the [0, 0] EagleCAD origin using the `xy_center = true,` parameter settings (making it easier to incorporate into other, larger projects).
+5. Some design files do use advanced features of OpenSCAD (such as *rotate_extrude()*), so a fairly recent version of OpenSCAD will be required. Models in the repository have been tested using OpenSCAD v. 2021.01 and 2019.05
 
 In the near future, I plan to include enclosure designs for various lengths (parameterizable) of the Adafruit NoePixel Strip, such as the [144 LED/m NeoPixel Digital RGBW LED Strip](https://www.adafruit.com/product/2848), cut to length. Stay tuned ...
 
@@ -32,6 +33,7 @@ if ($include_back == undef) {
     if (!_include_mounting_plate) {
         neopixel_stick_case_back (
             screw_case = true,
+            xy_center  = false,
             screw_hole_diameter = 3.4,
             screw_depth = 6.5,
             case_screw_separation = 60,
@@ -122,7 +124,7 @@ Changing from the default value to `flush_perim = false` would yield a small *st
 
 <img src="assets/screwin_enclosure_assy_notflush.png" width="500px">
 
-If you don't have flathead M3 screws on-hand, you could use pan-head or other rounded top screw instead (and changing the `screw_type = "rounded"` for the front enclosure part), which will remove the screw head inset:
+If you don't have flathead M3 screws on-hand, you could use pan-head or other rounded top screw instead (and changing the `screw_type = "round"` for the front enclosure part), which will remove the screw head inset:
 <img src="assets/screwin_enclosure_front_rounded.png" width="500px">
 
 and the screws will protrude slightly from the front of the assembly:
@@ -175,7 +177,7 @@ You can then modify the options listed beneath the list of include files and spe
 ```openscad
 // Set various enclosure options here:
 screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for simple enclosure
-screw_type = "flat";    // set enclosure screw type to "none", "rounded" or "flat"
+screw_type = "flat";    // set enclosure screw type to "none", "round", "cylinder" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
 front_alpha = 0.5;      // Set Alpha channel for color rendering of front enclosure part, aid in visualization
 back_alpha = 1.0;       // Set Alpha channel for color rendering of back enclosure part, aid in visualization
@@ -195,7 +197,7 @@ One other feature is the use of an **alpha** setting for the rendered color of t
 Finally - there is a fun, multi-stage animation of the assembly (**animate/neopixel_x8_stick_assy_animate.scad**) which can also be used for fit-checking and visualization of product assembly. It uses the same approach for settings and part visibility using special variables as the top-level assembly design file described above. In order to see the animation in action, you must first enable it using the OpenSCAD **View -> Animate** menu item, and then in the animation window pane you should set the **FPS** (frames per second) and **Steps** to some reasonable values (like FPS = 10; Steps = 200). Have fun!
 
 ## Utility Modules
-In order to help visualize and design the enclosure model parts described above, I created a few utility modules in OpenSCAD as well. These include 3D models of the Adafruit NeoPixel Stick (**neopixel_x8_stick_pwb.scad**) and a parameterizable Wiring Harness(**neopixel_wiring_harness.scad**), each described below. These design files are not intended to be printed, but rather for fit-check or visualization such as in the top-level assembly design or animation files described above.
+In order to help visualize and design the enclosure model parts described above, I created a few utility modules in OpenSCAD as well. These include 3D models of the Adafruit NeoPixel Stick (**neopixel_x8_stick_pwb.scad**) and a configurable Wiring Harness(**neopixel_wiring_harness.scad**), each described below. These design files are not intended to be printed, but rather for fit-check or visualization such as in the top-level assembly design or animation files described above.
 
 ### Adafruit NeoPixel Stick Assembly Model
 Being a staunch supporter of the Open Source hardware and software communities, Adafruit has generously provided the EagleCAD design files (schematic and board layout/routing) for their NeoPixel Stick products on Github: https://github.com/adafruit/NeoPixel-Sticks

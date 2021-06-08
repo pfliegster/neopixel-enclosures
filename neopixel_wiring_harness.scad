@@ -89,7 +89,7 @@ module neopixel_wiring_harness(num_conductor = 4, harness_length = 10,
     wire_strip_length = 3;
     wire_solder_length = 1.5;
     // pre-bend wire length calculated to bring wires out of the back of the center of the pwb
-    wire_len = pwb_length/2 - wire_bend_r - 0.5;
+    wire_len = ada_nps8_pwb_length/2 - wire_bend_r - 0.5;
 
     wire_color = ["black", "red", "white", "green"];
     // X,Y,Z Position offsets for harness wire connections, relative to NeoPixel PWB 0,0 origin:
@@ -98,7 +98,7 @@ module neopixel_wiring_harness(num_conductor = 4, harness_length = 10,
                     [0.5, pwb_pad_center_y1 + 2*pwb_pad_pitch_y, -wire_diam/2.0],
                     // Note: Wire #4 (index 3) is only used in 4 conductor version of the wiring harness, 
                     // when the DOUT signal isrequired for daisy-chaining NeoPixel sticks together:
-                    [pwb_length - 0.5, pwb_pad_center_y1 + 2*pwb_pad_pitch_y, -wire_diam/2.0] ];
+                    [ada_nps8_pwb_length - 0.5, pwb_pad_center_y1 + 2*pwb_pad_pitch_y, -wire_diam/2.0] ];
     dogleg_dist     = [ 5, 0, 5, 17];
     dogleg_offset   = [ pwb_pad_pitch_y - wire_diam,
                         0,
@@ -110,7 +110,7 @@ module neopixel_wiring_harness(num_conductor = 4, harness_length = 10,
     socket_dimensions  = (num_conductor == 3) ? jst3ph_socket_dimensions : jst4ph_socket_dimensions;
     interface_dims = (num_conductor == 3) ? jst3ph_socket_interface_dims : jst4ph_socket_interface_dims;
 
-    connector_x_offset = pwb_length/2;
+    connector_x_offset = ada_nps8_pwb_length/2;
     connector_y_offset = (num_conductor == 3) ? wire_offset[1].y : wire_offset[1].y + wire_diam/2;
     interface_z_offset = -(harness_length + wire_bend_r + wire_diam/2 + interface_dims.z/2);
     socket_z_offset = interface_z_offset - interface_dims.z;
@@ -121,7 +121,7 @@ module neopixel_wiring_harness(num_conductor = 4, harness_length = 10,
     interface_translate = [connector_x_offset, connector_y_offset, interface_z_offset];
 
     // Compute translation vector if user sets 'xy_center' == true:
-    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+    xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
 
     translate(xy_origin_translation) {
         // Add the wires:

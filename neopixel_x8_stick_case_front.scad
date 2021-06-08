@@ -87,14 +87,14 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
         assert(((screw_type == "round") || (screw_type == "flat") ||
                 (screw_type == "cylinder")  || (screw_type == "none")),
                 "Unsupported screw_type for enclosure mounting! Please check spelling.");
-        assert(case_screw_separation > pwb_length + 6.0);
+        assert(case_screw_separation > ada_nps8_pwb_length + 6.0);
     }
     
-    case_screw_offset = (case_screw_separation - pwb_length)/2;
+    case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
     
     color("dimgray", alpha = front_alpha) {
         // Compute translation vector if user sets 'xy_center' == true:
-        xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+        xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
         
         render() translate(xy_origin_translation) difference() {
             union() {
@@ -105,10 +105,10 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
                     union() {
                         back_cover_body(delta = 0.3, screw_case = screw_case, case_screw_offset = case_screw_offset);
                         translate([rounding_radius + pwb_lip_sides,
-                                rounding_radius + 0.75, pwb_height - rounding_radius]) {
+                                rounding_radius + 0.75, ada_nps8_pwb_height - rounding_radius]) {
                             minkowski() {
-                                cube([pwb_length - 2*rounding_radius - 2*pwb_lip_sides,
-                                    pwb_width - 2*rounding_radius - 1,
+                                cube([ada_nps8_pwb_length - 2*rounding_radius - 2*pwb_lip_sides,
+                                    ada_nps8_pwb_width - 2*rounding_radius - 1,
                                     led_height - 0.4]);
                                 sphere(rounding_radius, $fn=80);
                             }
@@ -117,19 +117,19 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
                 }
                 
                 // Now add cylinder and stem sections for the alignment pegs coming from the back part:
-                translate([pwb_hole1_x, pwb_hole1_y, pwb_height + led_height/2])
+                translate([pwb_hole1_x, pwb_hole1_y, ada_nps8_pwb_height + led_height/2])
                     cylinder(h = led_height, r = pwb_hole1_r + mtg_peg_front_shoulder,
                         center = true, $fn=80);
                 translate([pwb_hole1_x, pwb_hole1_y + pwb_hole1_r + mtg_peg_front_shoulder,
-                        pwb_height + led_height/2])
+                        ada_nps8_pwb_height + led_height/2])
                     cube([2*pwb_hole1_r + 2*mtg_peg_front_shoulder,
                         2*pwb_hole1_r + 2*mtg_peg_front_shoulder,
                         led_height], center = true);
-                translate([pwb_hole2_x, pwb_hole2_y, pwb_height + led_height/2])
+                translate([pwb_hole2_x, pwb_hole2_y, ada_nps8_pwb_height + led_height/2])
                     cylinder(h = led_height, r = pwb_hole2_r + mtg_peg_front_shoulder,
                         center = true, $fn=80);
                 translate([pwb_hole2_x, pwb_hole2_y + pwb_hole2_r + mtg_peg_front_shoulder,
-                        pwb_height + led_height/2])
+                        ada_nps8_pwb_height + led_height/2])
                     cube([2*pwb_hole2_r + 2*mtg_peg_front_shoulder,
                         2*pwb_hole2_r + 2*mtg_peg_front_shoulder,
                         led_height], center = true);
@@ -143,7 +143,7 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
                 for (i = [ 0: num_leds - 1 ]) {
                     translate([led_start_x + i*led_spacing_x - led_length/2 - cover_led_clearance/2,
                                led_start_y + i*led_spacing_y - led_width/2 - cover_led_clearance/2,
-                               pwb_height]) {
+                               ada_nps8_pwb_height]) {
                         cube([led_length + cover_led_clearance,
                               led_width + cover_led_clearance,
                               2*led_height]);
@@ -152,13 +152,13 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
                 // Add holes for enclosure screws, either with inset head or not:
                 if (screw_case) {
                     case_screw_length = 10;
-                    translate([-case_screw_offset, pwb_width/2,
-                        pwb_height + front_surface_z - case_screw_length])
+                    translate([-case_screw_offset, ada_nps8_pwb_width/2,
+                        ada_nps8_pwb_height + front_surface_z - case_screw_length])
                         generic_screw_model(screw_diam = 3.4, screw_type = screw_type,
                             head_diam = 6.1, head_height = 2.0,
                             cutout_region = true, length = case_screw_length, $fn=80);
-                    translate([pwb_length + case_screw_offset, pwb_width/2,
-                        pwb_height + front_surface_z - case_screw_length])
+                    translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2,
+                        ada_nps8_pwb_height + front_surface_z - case_screw_length])
                         generic_screw_model(screw_diam = 3.4, screw_type = screw_type,
                         head_diam = 6.1, head_height = 2.0,
                         cutout_region = true, length = case_screw_length, $fn=80);
@@ -187,12 +187,12 @@ if ($include_front == undef) {
         // Mounting Hardware variables:
         case_screw_length = 10;
         case_screw_separation = 60;
-        case_screw_offset = (case_screw_separation - pwb_length)/2;
+        case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 
         // Align screw flanges with front of front enclosure piece:
-        translate([-case_screw_offset, pwb_width/2, pwb_height + front_surface_z - case_screw_length])
+        translate([-case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height + front_surface_z - case_screw_length])
             test_align_shaft_1x10mm();
-        translate([pwb_length + case_screw_offset, pwb_width/2, pwb_height + front_surface_z - case_screw_length])
+        translate([ada_nps8_pwb_length + case_screw_offset, ada_nps8_pwb_width/2, ada_nps8_pwb_height + front_surface_z - case_screw_length])
             test_align_shaft_1x10mm();
     }
 }
