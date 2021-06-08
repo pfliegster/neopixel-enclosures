@@ -60,6 +60,7 @@ if ($include_back == undef) {
     if (!_include_mounting_plate) {
         neopixel_stick_case_back (
             screw_case = true,
+            xy_center  = false,
             screw_hole_diameter = 3.4,
             screw_depth = 6.5,
             case_screw_separation = 60,
@@ -94,6 +95,10 @@ if ($include_back == undef) {
 //      screw_case: Set to true for the enclosure that attaches front & back part
 //                  with mounting screws (M3 screws and nuts); False yields the Simple
 //                  Enclosure type.
+//      xy_center:  Set to 'true' in order to center the Model in the XY plane, useful for
+//                  incorporation of the module into other projects so that the user does not
+//                  need to be aware of the origin used by default in this project (false = align
+//                  this module with NeoPixel Stick 8 PWB lower-left corner at origin).
 //      screw_hole_diameter: Diameter of screw hole in enclosure part, only used if 
 //                  screw_case = true. For M3 hardware, set this to 3.4 mm in order to have
 //                  a little clearance for the screw when using an M3 Nut also. Otherwise,
@@ -125,6 +130,7 @@ if ($include_back == undef) {
 
 module neopixel_stick_case_back (
             screw_case = true,
+            xy_center  = false,
             screw_hole_diameter = 3.4,
             flush_perim = true,
             add_back_mounting_screws = false,
@@ -158,8 +164,11 @@ module neopixel_stick_case_back (
     echo("  --> Plus Peg Extension = ", peg_extension, " mm");
     echo("extra_back_thickness = ", extra_back_thickness, " mm");
 
-    color("dimgray", alpha = back_alpha){
-        union() {
+    color("dimgray", alpha = back_alpha) {
+        // Compute translation vector if user sets 'xy_center' == true:
+        xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+        
+        translate(xy_origin_translation) {
             render() difference() {
                 union() {
                     // Main body of the back cover model:
@@ -469,31 +478,41 @@ module neopixel_stick_case_back_on_mounting_plate (
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-module HarnessCutoutRegionExtended(length = 20) {
-    translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2, -length/2]) {
-        minkowski() {
-            cube([wire_harness_opening_length,
-                4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
-                length], center = true);
-            sphere(rounding_radius, $fn=80);
+module HarnessCutoutRegionExtended(length = 20, xy_center = false) {
+    // Compute translation vector if user sets 'xy_center' == true:
+    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+
+    translate(xy_origin_translation) {
+        translate([pwb_length/2, pwb_pad_center_y1 + pwb_pad_pitch_y + wire_diam/2, -length/2]) {
+            minkowski() {
+                cube([wire_harness_opening_length,
+                    4*wire_diam + pwb_pocket_margin - 2*rounding_radius,
+                    length], center = true);
+                sphere(rounding_radius, $fn=80);
+            }
         }
     }
 }
 
-module MountingScrewsCutoutRegion(screw_depth = 20, case_thickness = 10.25) {
+module MountingScrewsCutoutRegion(screw_depth = 20, xy_center = false, case_thickness = 10.25) {
     // First some error checking and variable computation:
     minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
     assert(case_thickness >= minimum_case_thickness);
     back_surface_z = case_thickness - front_surface_z;
 
-    extra_stub = 6;
-    translate([0.31*pwb_length, 0.43*pwb_width,
-        pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
-            cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
-    }
-    translate([0.69*pwb_length, 0.43*pwb_width,
-        pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
-            cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
+    // Compute translation vector if user sets 'xy_center' == true:
+    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+
+    translate(xy_origin_translation) {
+        extra_stub = 6;
+        translate([0.31*pwb_length, 0.43*pwb_width,
+            pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
+                cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
+        }
+        translate([0.69*pwb_length, 0.43*pwb_width,
+            pwb_height - screw_depth - back_surface_z + (extra_stub+screw_depth)/2]) {
+                cylinder(h = screw_depth + extra_stub, d = 2.8, center = true);
+        }
     }
 }
 
@@ -504,17 +523,24 @@ module MountingScrewsCutoutRegion(screw_depth = 20, case_thickness = 10.25) {
 module NeopixelCaseCutoutRegion(screw_case = true, 
             case_screw_separation = 60,
             case_thickness = 10.25,
+            xy_center = false,
             clearance = 1,          // clearance is extra region around body
             for_visualization = false ) {
-    if (for_visualization) {
-        color("red", alpha =  0.6) render() {
-            enclosure_body_cutout(screw_case = screw_case, case_screw_separation = case_screw_separation,
-                case_thickness = case_thickness, clearance = clearance);
-        }
-    } else {
-        render() {
-            enclosure_body_cutout(screw_case = screw_case, case_screw_separation = case_screw_separation,
-                case_thickness = case_thickness, clearance = clearance);
+
+    // Compute translation vector if user sets 'xy_center' == true:
+    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+
+    translate(xy_origin_translation) {
+        if (for_visualization) {
+            color("red", alpha =  0.6) render() {
+                enclosure_body_cutout(screw_case = screw_case, case_screw_separation = case_screw_separation,
+                    case_thickness = case_thickness, clearance = clearance);
+            }
+        } else {
+            render() {
+                enclosure_body_cutout(screw_case = screw_case, case_screw_separation = case_screw_separation,
+                    case_thickness = case_thickness, clearance = clearance);
+            }
         }
     }
 }

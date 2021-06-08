@@ -30,10 +30,10 @@
 //        DIN          White       White
 //        DOUT         Green
 //
-// Author: Keith Pflieger
+// Author:  Keith Pflieger
+// Github:  pfliegster (https://github.com/pfliegster)
 // License: CC BY-NC-SA 4.0
 //          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// Github: pfliegster (https://github.com/pfliegster)
 //
 // ****************************************************************************
 
@@ -51,6 +51,10 @@ include <neopixel_x8_stick_constants.scad>
 //      harness_length (default = 10mm):
 //          this defines the 'pigtail' length from the back of the PWB
 //          to the connector housing;
+//      xy_center:  Set to 'true' in order to center the Model in the XY plane, useful for
+//          incorporation of the module into other projects so that the user does not
+//          need to be aware of the origin used by default in this project (false = align
+//              this module with NeoPixel Stick 8 PWB lower-left corner at origin).
 //      connector_type (default = "unterminated"):
 //          set to either "socket" or "header" style, or as "unterminated".
 //          instantiation of the connector shell is useful for fit check for
@@ -58,7 +62,8 @@ include <neopixel_x8_stick_constants.scad>
 //
 // ****************************************************************************
 
-module neopixel_wiring_harness(num_conductor = 4, harness_length = 10, connector_type = "unterminated") {
+module neopixel_wiring_harness(num_conductor = 4, harness_length = 10,
+            xy_center = false, connector_type = "unterminated") {
     
     // First some error checking:
     assert(harness_length >= 0);
@@ -115,37 +120,41 @@ module neopixel_wiring_harness(num_conductor = 4, harness_length = 10, connector
     socket_translate    = [connector_x_offset, connector_y_offset, socket_z_offset];
     interface_translate = [connector_x_offset, connector_y_offset, interface_z_offset];
 
-    // Add the wires:
-    for (i = [ 0: num_conductor-1 ]) {
-        translate(wire_offset[i]) {
-            rotate([0, 90, (i==3) ? 180 : 0]) // Flip the 4th wire if present.
-                soldered_wire(prebend_length = wire_len - wire_strip_length,
-                    insulation_d = wire_diam,
-                    postbend_length = harness_length,
-                    soldered_length = wire_solder_length,
-                    stripped_length = wire_strip_length,
-                    bend_r = wire_bend_r,
-                    dogleg_dist = dogleg_dist[i],
-                    dogleg_offset = dogleg_offset[i],
-                    insulation_color = wire_color[i] );
+    // Compute translation vector if user sets 'xy_center' == true:
+    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+
+    translate(xy_origin_translation) {
+        // Add the wires:
+        for (i = [ 0: num_conductor-1 ]) {
+            translate(wire_offset[i]) {
+                rotate([0, 90, (i==3) ? 180 : 0]) // Flip the 4th wire if present.
+                    soldered_wire(prebend_length = wire_len - wire_strip_length,
+                        insulation_d = wire_diam,
+                        postbend_length = harness_length,
+                        soldered_length = wire_solder_length,
+                        stripped_length = wire_strip_length,
+                        bend_r = wire_bend_r,
+                        dogleg_dist = dogleg_dist[i],
+                        dogleg_offset = dogleg_offset[i],
+                        insulation_color = wire_color[i] );
+            }
         }
+
+        // Next, add the connector backshell for socket or header harness termination:
+        if (connector_type == "socket") {
+            // Connector backshell (Socket style connection, which includes 'interface' section too):
+            color("white") {
+                translate(interface_translate)
+                    rotate([0, 0, 90]) cube(interface_dims, center = true);
+                translate(socket_translate)
+                    rotate([0, 0, 90]) cube(socket_dimensions, center = true);
+            }
+        } else if (connector_type == "header") {
+            // Connector backshell (Header style connection):
+            color("white") translate(header_translate)
+                rotate([0, 0, 90]) cube(header_dimensions, center = true);
+        } // else don't do anything for "unterminated" wiring harness
     }
-
-    // Next, add the connector backshell for socket or header harness termination:
-    if (connector_type == "socket") {
-        // Connector backshell (Socket style connection, which includes 'interface' section too):
-        color("white") {
-            translate(interface_translate)
-                rotate([0, 0, 90]) cube(interface_dims, center = true);
-            translate(socket_translate)
-                rotate([0, 0, 90]) cube(socket_dimensions, center = true);
-        }
-    } else if (connector_type == "header") {
-        // Connector backshell (Header style connection):
-        color("white") translate(header_translate)
-            rotate([0, 0, 90]) cube(header_dimensions, center = true);
-    } // else don't do anything for "unterminated" wiring harness
-
 }
 
 // ****************************************************************************

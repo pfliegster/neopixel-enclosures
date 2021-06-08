@@ -46,6 +46,7 @@ if ($include_front == undef) {
     neopixel_stick_case_front(
         screw_case = true,
         screw_type = "flat",
+        xy_center = false,
         case_screw_separation = 60 );
 }
 
@@ -58,6 +59,10 @@ if ($include_front == undef) {
 //      screw_case: Set to true to build an enclosure that attaches front & back parts
 //                  with mounting screws (M3 screws and nuts); False yields the Simple
 //                  Enclosure type.
+//      xy_center:  Set to 'true' in order to center the Model in the XY plane, useful for
+//                  incorporation of the module into other projects so that the user does not
+//                  need to be aware of the origin used by default in this project (false = align
+//                  this module with NeoPixel Stick 8 PWB lower-left corner at origin).
 //      screw_type: Can be "none" (default, for fit check), "round" (panel or button
 //                  heads), "cylinder" or "flat" (e.g. 90 deg. inset/flush-mount screws).
 //      case_screw_separation: Distance between the two case screws, center to center (for 
@@ -76,7 +81,7 @@ if ($include_front == undef) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 module neopixel_stick_case_front(screw_case = false, screw_type = "none",
-            case_screw_separation = 60, front_alpha = 1.0) {
+            xy_center = false, case_screw_separation = 60, front_alpha = 1.0) {
 
     if (screw_case) {
         assert(((screw_type == "round") || (screw_type == "flat") ||
@@ -87,8 +92,11 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
     
     case_screw_offset = (case_screw_separation - pwb_length)/2;
     
-    color("dimgray", alpha = front_alpha){
-        render() difference() {
+    color("dimgray", alpha = front_alpha) {
+        // Compute translation vector if user sets 'xy_center' == true:
+        xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+        
+        render() translate(xy_origin_translation) difference() {
             union() {
                 difference() {
                     // First, add the main volume of the front enclosure part and hollow out

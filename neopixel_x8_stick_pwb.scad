@@ -1,21 +1,27 @@
 // ****************************************************************************
 //
-// File: neopixel_x8_stick_pwb.scad
+//  File: neopixel_x8_stick_pwb.scad
 //
-// Description:
-//   Rough 3D Model of Adafruit "NeoPixel 8 Stick" RGB/RGBW 5050 LED Assemblies,
-//   based on Adafruit EagleCAD V2 board file:
+//  Description:
+//      Rough 3D Model of Adafruit "NeoPixel 8 Stick" RGB/RGBW 5050 LED Assemblies,
+//      based on Adafruit EagleCAD V2 board file:
 //
-//     https://github.com/adafruit/NeoPixel-Sticks
+//      https://github.com/adafruit/NeoPixel-Sticks
 //
-//   The PWB model includes mounting holes, LED modules, 0805 Passive components,
-//   as well as visualized pads on back side of PWB for alignment/visualization
-//   of PWB in case and with wiring harness model.
+//      The PWB model includes mounting holes, LED modules, 0805 Passive components,
+//      as well as visualized pads on back side of PWB for alignment/visualization
+//      of PWB in case and with wiring harness model.
 //
-// Author: Keith Pflieger
-// License: CC BY-NC-SA 4.0
-//          (Creative Commons: Attribution-NonCommercial-ShareAlike)
-// github: pfliegster (https://github.com/pfliegster)
+//  Parameters:
+//      xy_center:  Set to 'true' in order to center the Model in the XY plane, useful for
+//                  incorporation of the module into other projects so that the user does not
+//                  need to be aware of the origin used by default in this project (false = align
+//                  this module with NeoPixel Stick 8 PWB lower-left corner at origin).
+//
+//  Author:  Keith Pflieger
+//  github:  pfliegster (https://github.com/pfliegster)
+//  License: CC BY-NC-SA 4.0
+//           (Creative Commons: Attribution-NonCommercial-ShareAlike)
 //
 // ****************************************************************************
 
@@ -23,8 +29,12 @@ include <neopixel_x8_stick_constants.scad>
 
 $fn=40;
 
-module pwb_model() {
-    union() {
+module pwb_model(xy_center = false) {
+
+    // Compute translation vector if user sets 'xy_center' == true:
+    xy_origin_translation = [ xy_center ? -pwb_length/2 : 0, xy_center ? -pwb_width/2  : 0, 0 ];
+    
+    translate(xy_origin_translation) {
         
         // Bare PWB:
         color("darkolivegreen", alpha = 1.0) {
