@@ -48,6 +48,13 @@ if ($include_front == undef) {
         screw_type = "flat",
         xy_center = false,
         case_screw_separation = 60 );
+/*    neopixel_stick_case_front_on_mounting_plate(
+        screw_case = true,
+        screw_type = "flat",
+        mounting_plate_length = 80,
+        mounting_plate_width = 40,
+        mounting_plate_thickness = 6,
+        case_screw_separation = 60 );*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +101,9 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
     
     color("dimgray", alpha = front_alpha) {
         // Compute translation vector if user sets 'xy_center' == true:
-        xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0, xy_center ? -ada_nps8_pwb_width/2  : 0, 0 ];
+        xy_origin_translation = [ xy_center ? -ada_nps8_pwb_length/2 : 0,
+                                  xy_center ? -ada_nps8_pwb_width/2  : 0,
+                                  0 ];
         
         render() translate(xy_origin_translation) difference() {
             union() {
@@ -170,6 +179,51 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
 
 /////////////////////////////////////////////////////////////////
 //
+//  Module: neopixel_stick_case_front_on_mounting_plate()
+//      Accessory module used to help align front enclosure model in
+//      projects using the neopixel_stick_case_back_on_mounting_plate()'.
+//
+//      This module performs a final 3D translation based on the back
+//      part mounting plate dimensions. All other front enclosure
+//      parameters are passed on directly to the underlying design
+//      module 'neopixel_stick_case_front()' defined above.
+//
+/////////////////////////////////////////////////////////////////
+module neopixel_stick_case_front_on_mounting_plate(
+            screw_case = true,
+            screw_type = "flat",
+            mounting_plate_length = 60,
+            mounting_plate_width = 35,
+            mounting_plate_thickness = 6,
+            case_screw_separation = 60,
+            front_alpha = 1.0) {
+
+    // Compute some back enclosure part parameters for use in translation of front part:
+    case_thickness = mounting_plate_thickness + cover_overlap_depth + front_surface_z;
+    minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
+    extra_back_thickness = case_thickness - minimum_case_thickness;
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
+    back_surface_z = case_thickness - front_surface_z;
+
+    xyz_translation = [
+        -ada_nps8_pwb_length/2,
+         mounting_plate_width/2 - ada_nps8_pwb_width - cover_wall_thickness -
+             cover_overlap_width - rounding_radius,
+         back_surface_z - ada_nps8_pwb_height - mounting_plate_thickness/2
+    ];
+
+    translate(xyz_translation) {
+        neopixel_stick_case_front(
+                screw_case = screw_case,
+                screw_type = screw_type,
+                xy_center = false,
+                case_screw_separation = case_screw_separation,
+                front_alpha = front_alpha);
+    }
+}
+
+/////////////////////////////////////////////////////////////////
+//
 // Testing:
 //   Temporary placement of other modules for visualization/fit-
 //   check or general testing purposes.
@@ -180,7 +234,7 @@ module neopixel_stick_case_front(screw_case = false, screw_type = "none",
 //
 /////////////////////////////////////////////////////////////////
 if ($include_front == undef) {
-    if ($include_pwb) pwb_model($fn=40);
+    if ($include_pwb) ada_nps8_pwb_model($fn=40);
 
     // Some Mounting Hardware models ...
 *    color(c = [0.2, 0.2, 0.2] , alpha = 1.0) union() {
@@ -197,5 +251,5 @@ if ($include_front == undef) {
     }
 }
 
-// Set this here to indicate the design file is properly loaded and available.
+// Set this here to indicate the design file is properly loaded and available to other design entities.
 $neopixel_front_parts_are_available = true;

@@ -80,6 +80,7 @@ if ($include_back == undef) {
             screw_depth = 10,
             case_screw_separation = 60,
             include_nut_pocket = true,
+            xyz_center  = false,
             nut_pocket_depth = 3.5,
             back_alpha = 1.0
         );
@@ -313,6 +314,11 @@ module neopixel_stick_case_back (
 //                  a little clearance for the screw when using an M3 Nut also. Otherwise,
 //                  you this can be slightly smaller if screwing directly into the plastic and
 //                  the nut is left off (include_nut_pocket = false).
+//      xyz_center: Set to 'true' in order to center the Model in the XY plane of the mounting
+//                  plate and Z center of the mounting plate thickness. This is seful for
+//                  incorporation of the module into other projects so that the user does not
+//                  need to be aware of the origin used by default in this project (false = align
+//                  this module with NeoPixel Stick 8 PWB lower-left corner at origin).
 //      include_nut_pocket: set to true to add a cutout/pocket in back of part for M3 nut.
 //      nut_pocket_depth: depth to inset the nut pocket in the back of the enclosure.
 //      screw_depth: depth (from front surface) to make the screw hole, useful if nut pocket
@@ -333,10 +339,11 @@ module neopixel_stick_case_back (
 module neopixel_stick_case_back_on_mounting_plate (
         mounting_plate_length = 60.0,
         mounting_plate_width = 35.0,
-        mounting_plate_thickness = 6.0, // We use this to compute our 'case_thickness' and 'extra_back_thickness'
+        mounting_plate_thickness = 6.0, // Used to compute 'case_thickness' and 'extra_back_thickness'
         case_screw_separation = 60.0,
         screw_hole_diameter = 3.4,
         include_nut_pocket = true,
+        xyz_center = false,
         nut_pocket_depth = 4,
         screw_depth = 10,
         back_alpha = 1.0) {
@@ -361,8 +368,16 @@ module neopixel_stick_case_back_on_mounting_plate (
     echo("extra_back_thickness = ", extra_back_thickness, " mm");
     echo("Overall case_thickness = ", case_thickness, " mm");
 
-    color("dimgray", alpha = back_alpha){
-        union() {
+    // Compute translation vector if user sets 'xyz_center' == true:
+    xyz_translation = xyz_center ?
+        [  -ada_nps8_pwb_length/2,
+            mounting_plate_width/2 - ada_nps8_pwb_width - cover_wall_thickness -
+                cover_overlap_width - rounding_radius,
+            back_surface_z - ada_nps8_pwb_height - mounting_plate_thickness/2
+        ] : [0, 0, 0];
+
+    color("dimgray", alpha = back_alpha) {
+        translate(xyz_translation) {
             render() difference() {
                 union() {
                     // Main body of the back cover model:
@@ -470,9 +485,85 @@ module neopixel_stick_case_back_on_mounting_plate (
     }
 }
 
+/////////////////////////////////////////////////////////////////
+//
+//  Module: neopixel_stick_pwb_for_mounting_plate()
+//      Accessory module used to help align neopixel stick PWB model in
+//      projects using the neopixel_stick_case_back_on_mounting_plate()'.
+//
+//      This module performs a final 3D translation based on the back
+//      part mounting plate dimensions. Other PWB model
+//      parameters are passed on directly to the underlying design
+//      module 'ada_nps8_pwb_model()'.
+//
+/////////////////////////////////////////////////////////////////
+module neopixel_stick_pwb_for_mounting_plate(
+            mounting_plate_length = 60,
+            mounting_plate_width = 35,
+            mounting_plate_thickness = 6) {
+
+    // Compute some back enclosure part parameters for use in translation of front part:
+    case_thickness = mounting_plate_thickness + cover_overlap_depth + front_surface_z;
+    minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
+    extra_back_thickness = case_thickness - minimum_case_thickness;
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
+    back_surface_z = case_thickness - front_surface_z;
+
+    xyz_translation = [
+        -ada_nps8_pwb_length/2,
+         mounting_plate_width/2 - ada_nps8_pwb_width - cover_wall_thickness -
+             cover_overlap_width - rounding_radius,
+         back_surface_z - ada_nps8_pwb_height - mounting_plate_thickness/2
+    ];
+
+    translate(xyz_translation) ada_nps8_pwb_model(xy_center = false, $fn=40);
+}
+
+/////////////////////////////////////////////////////////////////
+//
+//  Module: neopixel_wiring_harness_for_mounting_plate()
+//      Accessory module used to help align neopixel Wiring Harness model in
+//      projects using the neopixel_stick_case_back_on_mounting_plate()'.
+//
+//      This module performs a final 3D translation based on the back
+//      part mounting plate dimensions. All other wiring harness
+//      parameters are passed on directly to the underlying design
+//      module 'neopixel_wiring_harness()'.
+//
+/////////////////////////////////////////////////////////////////
+module neopixel_wiring_harness_for_mounting_plate(
+            mounting_plate_length = 60,
+            mounting_plate_width = 35,
+            mounting_plate_thickness = 6,
+            num_conductor = 4,
+            harness_length = 10,
+            connector_type = "unterminated") {
+
+    // Compute some back enclosure part parameters for use in translation of front part:
+    case_thickness = mounting_plate_thickness + cover_overlap_depth + front_surface_z;
+    minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
+    extra_back_thickness = case_thickness - minimum_case_thickness;
+    bottom_cover_height = bottom_cover_base_height + extra_back_thickness;
+    back_surface_z = case_thickness - front_surface_z;
+
+    xyz_translation = [
+        -ada_nps8_pwb_length/2,
+         mounting_plate_width/2 - ada_nps8_pwb_width - cover_wall_thickness -
+             cover_overlap_width - rounding_radius,
+         back_surface_z - ada_nps8_pwb_height - mounting_plate_thickness/2
+    ];
+
+    translate(xyz_translation)
+        neopixel_wiring_harness(
+            num_conductor = num_conductor,
+            harness_length = harness_length,
+            connector_type = connector_type,
+            xy_center = false,  $fn=40);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //
-//  Accessory Functions:
+//  Additional Accessory Functions:
 //      Useful for implementing NeoPixel Stick enclosures in other 3D Models in OpenSCAD,
 //      Such as for adding lightbars to the MuSHR.io racecar chassis.
 //
