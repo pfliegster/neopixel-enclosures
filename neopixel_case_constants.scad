@@ -377,6 +377,7 @@ module enclosure_body_cutout(screw_case = true, case_screw_separation = 60,
     case_screw_offset = (case_screw_separation - ada_nps8_pwb_length)/2;
 
     minimum_case_thickness = bottom_cover_base_height + rounding_radius + front_surface_z;
+    
     assert(case_thickness >= minimum_case_thickness);
     extra_back_thickness = case_thickness - minimum_case_thickness;
     // Compute overall back enclosure part height from passed parameter:

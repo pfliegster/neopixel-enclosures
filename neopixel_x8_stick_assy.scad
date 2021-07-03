@@ -43,7 +43,7 @@ _explode_view = false;
 screw_case = true;      // 'true' for screw-in version of enclosure, 'false' for simple enclosure
 screw_type = "flat";    // set enclosure screw type to "none", "round", "cylinder" or "flat"
 flush_case = true;      // Used to modify back enclosure piece to be flush with the top around the perimeter
-front_alpha = 0.5;      // Set Alpha channel for color rendering of front enclosure part, aid in visualization
+front_alpha = 0.6;      // Set Alpha channel for color rendering of front enclosure part, aid in visualization
 back_alpha = 1.0;       // Set Alpha channel for color rendering of back enclosure part, aid in visualization
 case_screw_length = 10; // length of the physical mounting screws
 include_screws = true;  // include M3 screws for assembly visualization?
@@ -132,7 +132,7 @@ union() {
     echo("--> Overall height = ", back_surface_z + front_surface_z, " mm");
     
     if (screw_case) {
-        color(c = [0.2, 0.2, 0.2] , alpha = 1.0) {
+        color(c = [0.3, 0.3, 0.3] , alpha = 1.0) {
             translate([0, 0, enclosure_screws_z]) {
                 if (include_screws) {
                     // Align screw flanges with front of front enclosure piece:
