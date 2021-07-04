@@ -87,7 +87,7 @@ if ($include_front == undef) {
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 
-module neopixel_stick_case_front(screw_case = false, screw_type = "none",
+module neopixel_stick_case_front(screw_case = true, screw_type = "flat",
             xy_center = false, case_screw_separation = 60, front_alpha = 1.0) {
 
     if (screw_case) {
